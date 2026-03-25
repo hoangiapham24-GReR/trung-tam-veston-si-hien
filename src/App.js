@@ -26,7 +26,7 @@ const firebaseConfig = {
   appId: "1:136164117027:web:6f47ce84ab91d4ceb3bf96",
 };
 
-// 🔒 MÃ PIN BÍ MẬT DÀNH RIÊNG CHO CHỦ TIỆM (ĐÃ ĐỔI THÀNH 2004)
+// 🔒 MÃ PIN BÍ MẬT DÀNH RIÊNG CHO CHỦ TIỆM
 const ADMIN_PASSCODE = "2004";
 let db;
 let auth;
@@ -873,9 +873,9 @@ const AdminDashboard = ({
     <div className="space-y-6">
       <header className="flex flex-col sm:flex-row justify-between items-center bg-[#133c3e] p-6 rounded-2xl shadow-xl border-b-4 border-[#e5c07b]">
         <div className="flex items-center gap-4">
-          {/* LOGO GÓC TRÁI MÀN HÌNH QUẢN LÝ */}
+          {/* LOGO GÓC TRÁI MÀN HÌNH QUẢN LÝ - DÙNG ẢNH HD TEST */}
           <img
-            src="/LOGO.png"
+            src="https://images.unsplash.com/photo-1594938298596-70f56fb6040f?auto=format&fit=crop&w=500&q=80"
             alt="Logo"
             className="w-16 h-16 rounded-full border-2 border-[#e5c07b] shadow-md bg-white object-cover"
           />
@@ -1406,10 +1406,10 @@ const LoginScreen = ({ setAppRole, OWNER_ID, showToast }) => {
   };
   return (
     <div className="max-w-md w-full mx-auto mt-16 p-6 sm:p-10 bg-white shadow-2xl rounded-[2rem] border border-gray-200">
-      {/* LOGO ĐĂNG NHẬP */}
+      {/* LOGO ĐĂNG NHẬP - DÙNG ẢNH HD TEST */}
       <div className="text-center mb-10">
         <img
-          src="/LOGO.png"
+          src="https://images.unsplash.com/photo-1594938298596-70f56fb6040f?auto=format&fit=crop&w=500&q=80"
           alt="Logo Veston Sĩ Hiền"
           className="w-32 h-32 mx-auto mb-6 rounded-full shadow-2xl border-4 border-[#e5c07b] object-cover"
         />
