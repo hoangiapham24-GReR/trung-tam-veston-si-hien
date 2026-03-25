@@ -15,7 +15,7 @@ import {
   getDocs,
 } from "firebase/firestore";
 
-// Chìa khóa Firebase của bạn
+// CẤU HÌNH FIREBASE CỦA TIỆM
 const appId = "tiem-may-veston-si-hien";
 const firebaseConfig = {
   apiKey: "AIzaSyDuB85lWrkVb0DAnTyxIp6sUERdbWcQAow",
@@ -26,7 +26,8 @@ const firebaseConfig = {
   appId: "1:136164117027:web:6f47ce84ab91d4ceb3bf96",
 };
 
-const ADMIN_PASSCODE = "2024";
+// 🔒 MÃ PIN BÍ MẬT DÀNH RIÊNG CHO CHỦ TIỆM (ĐÃ ĐỔI THÀNH 2004)
+const ADMIN_PASSCODE = "2004";
 let db;
 let auth;
 let OWNER_ID = null;
@@ -77,7 +78,7 @@ const generateOrderName = (name, phone) => {
 };
 
 // ==========================================
-// 🚀 TÍNH NĂNG GỬI EMAIL TỰ ĐỘNG NGẦM (EMAILJS)
+// 🚀 TÍNH NĂNG GỬI EMAIL TỰ ĐỘNG
 // ==========================================
 const sendEmailInvoice = async (customer, showToast) => {
   if (!customer.email) {
@@ -87,9 +88,7 @@ const sendEmailInvoice = async (customer, showToast) => {
     );
     return;
   }
-
   showToast("Đang gửi email tự động...", "success");
-
   const EMAILJS_SERVICE_ID = "service_r1rgdnp";
   const EMAILJS_TEMPLATE_ID = "template_2ypt4fw";
   const EMAILJS_PUBLIC_KEY = "gq1x0nWZpwbsYajd0";
@@ -119,13 +118,9 @@ const sendEmailInvoice = async (customer, showToast) => {
         }),
       }
     );
-
-    if (response.ok) {
+    if (response.ok)
       showToast("Đã gửi Hóa Đơn thành công đến email khách hàng!", "success");
-    } else {
-      const err = await response.text();
-      showToast("Lỗi gửi mail: " + err, "error");
-    }
+    else showToast("Lỗi gửi mail: " + (await response.text()), "error");
   } catch (error) {
     showToast("Không thể kết nối đến máy chủ gửi Mail.", "error");
   }
@@ -189,7 +184,7 @@ const MeasurementInput = ({ label, name, value, onChange }) => (
       onChange={(e) =>
         onChange({ target: { name, value: e.target.value.replace(/\D/g, "") } })
       }
-      className="p-2 border rounded-lg bg-white border-gray-300 focus:ring-2 focus:ring-blue-400 outline-none transition"
+      className="p-2 border rounded-lg bg-white border-gray-300 focus:ring-2 focus:ring-[#133c3e] outline-none transition"
       placeholder="cm"
     />
   </div>
@@ -211,8 +206,8 @@ const CurrencyInput = ({ label, name, value, onChange, readOnly = false }) => (
       readOnly={readOnly}
       className={`p-2 border rounded-lg outline-none transition ${
         readOnly
-          ? "bg-gray-100 text-gray-500"
-          : "bg-white border-gray-300 focus:ring-2 focus:ring-red-400"
+          ? "bg-gray-100 text-gray-500 font-bold"
+          : "bg-white border-gray-300 focus:ring-2 focus:ring-red-400 font-bold"
       }`}
       placeholder="0"
     />
@@ -266,11 +261,11 @@ const ImageUploadInput = ({ label, value, onChange }) => {
           type="file"
           accept="image/*"
           onChange={handleFileChange}
-          className="p-2 border rounded-lg bg-white border-gray-300 text-sm focus:ring-blue-500 focus:border-blue-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer"
+          className="p-2 border rounded-lg bg-white border-gray-300 text-sm focus:ring-[#133c3e] focus:border-[#133c3e] file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-[#133c3e]/10 file:text-[#133c3e] hover:file:bg-[#133c3e]/20 cursor-pointer"
         />
       )}
       {isUploading && (
-        <span className="text-xs text-blue-500 mt-1 animate-pulse">
+        <span className="text-xs text-[#133c3e] mt-1 animate-pulse">
           Đang nén ảnh...
         </span>
       )}
@@ -278,6 +273,7 @@ const ImageUploadInput = ({ label, value, onChange }) => {
   );
 };
 
+// BẢN HIỂN THỊ ĐƠN HÀNG (SẼ ẨN NÚT SỬA/XÓA NẾU LÀ KHÁCH)
 const CustomerCard = ({ customer, ownerId, appId, db, showToast, role }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -382,7 +378,7 @@ const CustomerCard = ({ customer, ownerId, appId, db, showToast, role }) => {
       <div
         className={`p-4 cursor-pointer flex justify-between items-center transition-colors ${
           isExpanded
-            ? "bg-blue-50 border-b border-blue-100"
+            ? "bg-[#133c3e]/5 border-b border-[#133c3e]/10"
             : "hover:bg-gray-50"
         }`}
         onClick={() => setIsExpanded(!isExpanded)}
@@ -404,16 +400,18 @@ const CustomerCard = ({ customer, ownerId, appId, db, showToast, role }) => {
           </p>
           <p className="text-xs text-gray-400 mt-1">
             Mã đơn:{" "}
-            <span className="font-mono text-gray-600 font-semibold">
+            <span className="font-mono text-[#133c3e] font-bold">
               {customer.orderName}
             </span>
           </p>
         </div>
         <div className="flex flex-col items-end">
-          <span className="text-sm font-bold text-red-600">
+          <span className="text-sm font-black text-red-600">
             {formatCurrency(customer.conLai)} đ
           </span>
-          <span className="text-[10px] text-gray-400">Còn nợ</span>
+          <span className="text-[10px] text-gray-400 uppercase font-bold">
+            Còn nợ
+          </span>
           <svg
             className={`w-5 h-5 text-gray-400 mt-2 transform transition-transform ${
               isExpanded ? "rotate-180" : "rotate-0"
@@ -443,7 +441,7 @@ const CustomerCard = ({ customer, ownerId, appId, db, showToast, role }) => {
                 }}
                 className="px-4 py-2 text-sm font-bold rounded-lg bg-teal-50 text-teal-700 hover:bg-teal-100 border border-teal-200 transition shadow-sm"
               >
-                ✉️ Gửi Email Tự Động
+                ✉️ Gửi Email
               </button>
               <button
                 onClick={(e) => {
@@ -454,7 +452,7 @@ const CustomerCard = ({ customer, ownerId, appId, db, showToast, role }) => {
                 className={`px-4 py-2 text-sm font-bold rounded-lg transition shadow-sm ${
                   isEditing
                     ? "bg-gray-500 text-white hover:bg-gray-600"
-                    : "bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200"
+                    : "bg-[#133c3e] text-[#e5c07b] hover:bg-[#0f2d2f] border border-[#e5c07b]"
                 }`}
               >
                 {isEditing ? "Hủy Sửa" : "✏️ Sửa Đơn"}
@@ -486,7 +484,6 @@ const CustomerCard = ({ customer, ownerId, appId, db, showToast, role }) => {
                   unit="bộ"
                 />
               </div>
-
               {customer.generatedProfile && (
                 <div className="p-4 bg-gradient-to-r from-pink-50 to-purple-50 rounded-xl border border-pink-100 shadow-sm">
                   <h4 className="font-bold text-pink-700 text-sm mb-1 flex items-center gap-1">
@@ -497,7 +494,6 @@ const CustomerCard = ({ customer, ownerId, appId, db, showToast, role }) => {
                   </p>
                 </div>
               )}
-
               {customer.fabricImageURL && (
                 <div>
                   <h4 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">
@@ -510,9 +506,8 @@ const CustomerCard = ({ customer, ownerId, appId, db, showToast, role }) => {
                   />
                 </div>
               )}
-
               <div>
-                <h4 className="text-xs font-bold text-gray-500 uppercase tracking-wider border-b pb-1 mb-3">
+                <h4 className="text-xs font-bold text-[#133c3e] uppercase tracking-wider border-b border-[#133c3e]/20 pb-1 mb-3">
                   Số Đo Áo/Vest (cm)
                 </h4>
                 <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
@@ -526,9 +521,8 @@ const CustomerCard = ({ customer, ownerId, appId, db, showToast, role }) => {
                   <CommonField label="Hạ eo" value={customer.haEo} />
                 </div>
               </div>
-
               <div>
-                <h4 className="text-xs font-bold text-gray-500 uppercase tracking-wider border-b pb-1 mb-3">
+                <h4 className="text-xs font-bold text-[#133c3e] uppercase tracking-wider border-b border-[#133c3e]/20 pb-1 mb-3">
                   Số Đo Quần/Váy (cm)
                 </h4>
                 <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
@@ -541,9 +535,8 @@ const CustomerCard = ({ customer, ownerId, appId, db, showToast, role }) => {
                   <CommonField label="Ống" value={customer.ong} />
                 </div>
               </div>
-
               <div>
-                <h4 className="text-xs font-bold text-gray-500 uppercase tracking-wider border-b pb-1 mb-3">
+                <h4 className="text-xs font-bold text-[#133c3e] uppercase tracking-wider border-b border-[#133c3e]/20 pb-1 mb-3">
                   Thanh Toán (VNĐ)
                 </h4>
                 <div className="grid grid-cols-3 gap-2 bg-red-50/50 p-3 rounded-xl border border-red-100">
@@ -567,13 +560,12 @@ const CustomerCard = ({ customer, ownerId, appId, db, showToast, role }) => {
                     <span className="text-[10px] text-gray-500 font-bold uppercase">
                       Còn lại
                     </span>
-                    <span className="font-bold text-red-600">
+                    <span className="font-black text-red-600">
                       {formatCurrency(customer.conLai)}
                     </span>
                   </div>
                 </div>
               </div>
-
               {customer.notes && (
                 <div className="bg-yellow-50 p-3 rounded-xl border border-yellow-100">
                   <h4 className="text-xs font-bold text-yellow-700 uppercase mb-1">
@@ -591,12 +583,11 @@ const CustomerCard = ({ customer, ownerId, appId, db, showToast, role }) => {
                 e.preventDefault();
                 saveEdit();
               }}
-              className="space-y-5 bg-white p-5 rounded-xl border border-blue-200 shadow-lg"
+              className="space-y-5 bg-white p-5 rounded-xl border-2 border-[#133c3e] shadow-lg"
             >
-              <h3 className="font-bold text-lg text-blue-800 border-b pb-2">
-                Chỉnh Sửa Đơn Hàng
+              <h3 className="font-black text-lg text-[#133c3e] border-b pb-2">
+                ✏️ Chỉnh Sửa Đơn Hàng
               </h3>
-
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div>
                   <label className="text-xs font-medium">Tên Khách Hàng</label>
@@ -605,7 +596,7 @@ const CustomerCard = ({ customer, ownerId, appId, db, showToast, role }) => {
                     name="name"
                     value={editedCustomer.name}
                     onChange={handleEditChange}
-                    className="w-full p-2 border rounded-lg bg-gray-50 focus:bg-white"
+                    className="w-full p-2 border rounded-lg"
                   />
                 </div>
                 <div>
@@ -615,7 +606,7 @@ const CustomerCard = ({ customer, ownerId, appId, db, showToast, role }) => {
                     name="phone"
                     value={editedCustomer.phone}
                     onChange={handleEditChange}
-                    className="w-full p-2 border rounded-lg bg-gray-50 focus:bg-white"
+                    className="w-full p-2 border rounded-lg"
                   />
                 </div>
                 <div>
@@ -625,11 +616,10 @@ const CustomerCard = ({ customer, ownerId, appId, db, showToast, role }) => {
                     name="email"
                     value={editedCustomer.email}
                     onChange={handleEditChange}
-                    className="w-full p-2 border rounded-lg bg-gray-50 focus:bg-white"
+                    className="w-full p-2 border rounded-lg"
                   />
                 </div>
               </div>
-
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 <div>
                   <label className="text-xs font-medium">Mã Vải</label>
@@ -643,7 +633,7 @@ const CustomerCard = ({ customer, ownerId, appId, db, showToast, role }) => {
                 </div>
                 <div className="col-span-2 sm:col-span-3">
                   <ImageUploadInput
-                    label="Tải Ảnh Vải Từ Máy/Điện Thoại"
+                    label="Đổi Ảnh Vải"
                     value={editedCustomer.fabricImageURL}
                     onChange={(base64) =>
                       setEditedCustomer({
@@ -654,7 +644,6 @@ const CustomerCard = ({ customer, ownerId, appId, db, showToast, role }) => {
                   />
                 </div>
               </div>
-
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 <div>
                   <label className="text-xs font-medium">Ngày Nhận</label>
@@ -692,8 +681,7 @@ const CustomerCard = ({ customer, ownerId, appId, db, showToast, role }) => {
                   </select>
                 </div>
               </div>
-
-              <h4 className="text-sm font-bold text-gray-700 border-b pb-1 mt-4">
+              <h4 className="text-sm font-bold text-[#133c3e] border-b pb-1 mt-4">
                 Số Đo Áo/Vest
               </h4>
               <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
@@ -746,8 +734,7 @@ const CustomerCard = ({ customer, ownerId, appId, db, showToast, role }) => {
                   onChange={handleEditChange}
                 />
               </div>
-
-              <h4 className="text-sm font-bold text-gray-700 border-b pb-1 mt-4">
+              <h4 className="text-sm font-bold text-[#133c3e] border-b pb-1 mt-4">
                 Số Đo Quần/Váy
               </h4>
               <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
@@ -794,8 +781,7 @@ const CustomerCard = ({ customer, ownerId, appId, db, showToast, role }) => {
                   onChange={handleEditChange}
                 />
               </div>
-
-              <h4 className="text-sm font-bold text-gray-700 border-b pb-1 mt-4">
+              <h4 className="text-sm font-bold text-red-700 border-b pb-1 mt-4">
                 Thanh Toán
               </h4>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
@@ -819,7 +805,6 @@ const CustomerCard = ({ customer, ownerId, appId, db, showToast, role }) => {
                   readOnly={true}
                 />
               </div>
-
               <div>
                 <label className="text-xs font-medium">Ghi Chú</label>
                 <textarea
@@ -830,13 +815,12 @@ const CustomerCard = ({ customer, ownerId, appId, db, showToast, role }) => {
                   className="w-full p-2 border rounded-lg"
                 ></textarea>
               </div>
-
               <button
                 type="submit"
                 disabled={isSaving}
-                className="w-full py-3 rounded-xl text-white bg-green-600 hover:bg-green-700 font-bold shadow-lg transition transform hover:scale-[1.02]"
+                className="w-full py-3 rounded-xl text-[#e5c07b] bg-[#133c3e] hover:bg-[#0f2d2f] font-black shadow-lg transition transform hover:scale-[1.02] border border-[#e5c07b]"
               >
-                {isSaving ? "Đang Lưu..." : "XÁC NHẬN SỬA"}
+                {isSaving ? "Đang Lưu..." : "💾 XÁC NHẬN SỬA ĐƠN"}
               </button>
             </form>
           )}
@@ -846,6 +830,9 @@ const CustomerCard = ({ customer, ownerId, appId, db, showToast, role }) => {
   );
 };
 
+// ==========================================
+// MÀN HÌNH CHỦ TIỆM QUẢN LÝ
+// ==========================================
 const AdminDashboard = ({
   userId,
   customers,
@@ -884,31 +871,37 @@ const AdminDashboard = ({
 
   return (
     <div className="space-y-6">
-      <header className="flex flex-col sm:flex-row justify-between items-center bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
-        <div>
-          <h1 className="text-2xl font-black text-gray-800 tracking-tight">
-            HỆ THỐNG TIỆM MAY
-          </h1>
-          <p className="text-sm text-gray-500">
-            Quản lý chuyên nghiệp & dễ dàng
-          </p>
+      <header className="flex flex-col sm:flex-row justify-between items-center bg-[#133c3e] p-6 rounded-2xl shadow-xl border-b-4 border-[#e5c07b]">
+        <div className="flex items-center gap-4">
+          {/* LOGO GÓC TRÁI MÀN HÌNH QUẢN LÝ */}
+          <img
+            src="/LOGO.png"
+            alt="Logo"
+            className="w-16 h-16 rounded-full border-2 border-[#e5c07b] shadow-md bg-white object-cover"
+          />
+          <div>
+            <h1 className="text-2xl font-black text-[#e5c07b] tracking-wide uppercase">
+              Trung Tâm Veston Sĩ Hiền
+            </h1>
+            <p className="text-sm text-gray-300">Hệ Thống Quản Lý Nội Bộ</p>
+          </div>
         </div>
         <div className="mt-4 sm:mt-0 flex gap-2">
           <button
             onClick={() => exportToCSV(filteredCustomers)}
-            className="px-4 py-2 text-sm font-bold rounded-lg bg-green-50 text-green-700 border border-green-200 hover:bg-green-100 transition shadow-sm flex items-center"
+            className="px-4 py-2 text-sm font-bold rounded-lg bg-white/10 text-white hover:bg-white/20 transition shadow-sm border border-white/20"
           >
-            📊 Xuất Excel
+            📊 Tải Excel
           </button>
           <button
             onClick={() => setIsAdding(!isAdding)}
-            className={`px-5 py-2 text-sm font-bold rounded-lg text-white shadow-md transition ${
+            className={`px-5 py-2 text-sm font-bold rounded-lg transition border shadow-lg ${
               isAdding
-                ? "bg-gray-600 hover:bg-gray-700"
-                : "bg-blue-600 hover:bg-blue-700"
+                ? "bg-gray-200 text-gray-800"
+                : "bg-[#e5c07b] text-[#133c3e] hover:bg-yellow-500 border-[#e5c07b]"
             }`}
           >
-            {isAdding ? "Hủy" : "+ THÊM ĐƠN HÀNG"}
+            {isAdding ? "Hủy" : "+ THÊM ĐƠN KHÁCH HÀNG"}
           </button>
         </div>
       </header>
@@ -916,7 +909,7 @@ const AdminDashboard = ({
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="bg-white p-5 rounded-2xl shadow-sm border border-blue-100 border-l-4 border-l-blue-500">
           <p className="text-xs text-gray-500 font-bold uppercase tracking-wider mb-1">
-            Số lượng đơn
+            Tổng Số Đơn
           </p>
           <p className="text-3xl font-black text-blue-700">
             {filteredCustomers.length}
@@ -932,7 +925,7 @@ const AdminDashboard = ({
         </div>
         <div className="bg-white p-5 rounded-2xl shadow-sm border border-red-100 border-l-4 border-l-red-500">
           <p className="text-xs text-gray-500 font-bold uppercase tracking-wider mb-1">
-            Khách đang nợ
+            Khách Đang Nợ
           </p>
           <p className="text-3xl font-black text-red-700">
             {formatCurrency(totalUnpaid)} đ
@@ -941,9 +934,9 @@ const AdminDashboard = ({
       </div>
 
       {isAdding && (
-        <div className="bg-white shadow-xl rounded-3xl p-6 md:p-8 border border-gray-100 animate-slide-down">
-          <h2 className="text-xl font-bold text-gray-800 mb-6 flex items-center">
-            📝 Tạo Đơn Hàng Mới
+        <div className="bg-white shadow-2xl rounded-3xl p-6 md:p-8 border-2 border-[#133c3e] animate-slide-down">
+          <h2 className="text-xl font-black text-[#133c3e] mb-6 flex items-center border-b pb-3 uppercase">
+            📝 TẠO ĐƠN HÀNG MỚI
           </h2>
           <form onSubmit={handleAddCustomer} className="space-y-6">
             <div className="bg-gray-50 p-5 rounded-2xl border border-gray-200">
@@ -958,8 +951,7 @@ const AdminDashboard = ({
                     name="name"
                     value={newCustomer.name}
                     onChange={handleInputChange}
-                    className="mt-1 w-full p-3 border border-gray-300 rounded-xl shadow-sm focus:ring-2 focus:ring-blue-500 outline-none transition"
-                    placeholder="Ví dụ: Chị Lan"
+                    className="mt-1 w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#133c3e] outline-none"
                   />
                 </div>
                 <div>
@@ -972,8 +964,7 @@ const AdminDashboard = ({
                     name="phone"
                     value={newCustomer.phone}
                     onChange={handleInputChange}
-                    className="mt-1 w-full p-3 border border-gray-300 rounded-xl shadow-sm focus:ring-2 focus:ring-blue-500 outline-none transition"
-                    placeholder="090..."
+                    className="mt-1 w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#133c3e] outline-none"
                   />
                 </div>
                 <div>
@@ -985,8 +976,7 @@ const AdminDashboard = ({
                     name="email"
                     value={newCustomer.email}
                     onChange={handleInputChange}
-                    className="mt-1 w-full p-3 border border-gray-300 rounded-xl shadow-sm focus:ring-2 focus:ring-blue-500 outline-none transition"
-                    placeholder="de.gui.hoa.don@gmail.com"
+                    className="mt-1 w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#133c3e] outline-none"
                   />
                 </div>
               </div>
@@ -1000,13 +990,12 @@ const AdminDashboard = ({
                     name="fabricCode"
                     value={newCustomer.fabricCode}
                     onChange={handleInputChange}
-                    className="mt-1 w-full p-3 border border-gray-300 rounded-xl shadow-sm"
-                    placeholder="Vải lụa Ý..."
+                    className="mt-1 w-full p-3 border border-gray-300 rounded-xl"
                   />
                 </div>
                 <div className="col-span-2">
                   <ImageUploadInput
-                    label="📸 Mở Camera Chụp Hoặc Tải Ảnh Vải"
+                    label="📸 Mở Camera Chụp Ảnh Vải"
                     value={newCustomer.fabricImageURL}
                     onChange={(base64) =>
                       setNewCustomer({ ...newCustomer, fabricImageURL: base64 })
@@ -1026,7 +1015,7 @@ const AdminDashboard = ({
                   name="ngayNhan"
                   value={newCustomer.ngayNhan}
                   onChange={handleInputChange}
-                  className="mt-1 w-full p-3 border border-gray-300 rounded-xl shadow-sm"
+                  className="mt-1 w-full p-3 border border-gray-300 rounded-xl"
                 />
               </div>
               <div>
@@ -1038,7 +1027,7 @@ const AdminDashboard = ({
                   name="ngayGiao"
                   value={newCustomer.ngayGiao}
                   onChange={handleInputChange}
-                  className="mt-1 w-full p-3 border border-gray-300 rounded-xl shadow-sm"
+                  className="mt-1 w-full p-3 border border-gray-300 rounded-xl"
                 />
               </div>
               <div>
@@ -1059,7 +1048,7 @@ const AdminDashboard = ({
                   name="status"
                   value={newCustomer.status}
                   onChange={handleInputChange}
-                  className="mt-1 w-full p-3 border border-gray-300 rounded-xl shadow-sm bg-white"
+                  className="mt-1 w-full p-3 border border-gray-300 rounded-xl bg-white"
                 >
                   <option value="Chờ xử lý">Chờ xử lý</option>
                   <option value="Đang may">Đang may</option>
@@ -1070,8 +1059,8 @@ const AdminDashboard = ({
             </div>
 
             <div className="flex flex-col sm:flex-row gap-6">
-              <div className="flex-1 bg-blue-50 p-5 rounded-2xl border border-blue-100">
-                <h3 className="text-sm font-black uppercase tracking-widest text-blue-800 mb-4">
+              <div className="flex-1 bg-blue-50/50 p-5 rounded-2xl border border-blue-100">
+                <h3 className="text-sm font-black uppercase tracking-widest text-blue-800 mb-4 border-b pb-2">
                   Số Đo Áo / Vest
                 </h3>
                 <div className="grid grid-cols-3 gap-3">
@@ -1125,8 +1114,8 @@ const AdminDashboard = ({
                   />
                 </div>
               </div>
-              <div className="flex-1 bg-yellow-50 p-5 rounded-2xl border border-yellow-100">
-                <h3 className="text-sm font-black uppercase tracking-widest text-yellow-800 mb-4">
+              <div className="flex-1 bg-yellow-50/50 p-5 rounded-2xl border border-yellow-100">
+                <h3 className="text-sm font-black uppercase tracking-widest text-yellow-800 mb-4 border-b pb-2">
                   Số Đo Quần / Váy
                 </h3>
                 <div className="grid grid-cols-3 gap-3">
@@ -1176,13 +1165,7 @@ const AdminDashboard = ({
               </div>
             </div>
 
-            {/* ĐÃ NÂNG CẤP "BỘ NÃO" CHO AI BẰNG CÂU LỆNH MỚI */}
             <div className="bg-gradient-to-r from-pink-50 to-purple-50 p-5 rounded-2xl border border-pink-100">
-              <div className="flex justify-between items-center mb-2">
-                <h3 className="text-sm font-black uppercase tracking-widest text-pink-800">
-                  Cố Vấn Vóc Dáng AI
-                </h3>
-              </div>
               <button
                 type="button"
                 onClick={generateFitProfile}
@@ -1195,7 +1178,7 @@ const AdminDashboard = ({
               >
                 {isGeneratingProfile
                   ? "⏳ AI đang suy nghĩ..."
-                  : "✨ Nhờ AI Phân Tích Vóc Dáng (Bấm sau khi nhập số đo)"}
+                  : "✨ Bấm Nhờ AI Phân Tích Vóc Dáng Lên Đồ"}
               </button>
               {generatedProfile && (
                 <div className="mt-4 p-4 bg-white rounded-xl shadow-sm text-sm text-gray-700 border border-pink-100 leading-relaxed font-semibold whitespace-pre-line">
@@ -1204,8 +1187,8 @@ const AdminDashboard = ({
               )}
             </div>
 
-            <div className="bg-red-50 p-5 rounded-2xl border border-red-100">
-              <h3 className="text-sm font-black uppercase tracking-widest text-red-800 mb-4">
+            <div className="bg-red-50/50 p-5 rounded-2xl border border-red-100">
+              <h3 className="text-sm font-black uppercase tracking-widest text-red-800 mb-4 border-b pb-2">
                 Thanh Toán
               </h3>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
@@ -1233,21 +1216,21 @@ const AdminDashboard = ({
 
             <div className="bg-gray-50 p-5 rounded-2xl border border-gray-200">
               <label className="text-sm font-bold text-gray-700 mb-2 block">
-                Ghi Chú
+                Ghi Chú Đặc Biệt
               </label>
               <textarea
                 name="notes"
                 value={newCustomer.notes}
                 onChange={handleInputChange}
                 rows="2"
-                className="w-full p-3 border border-gray-300 rounded-xl shadow-sm outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#133c3e] outline-none"
               ></textarea>
             </div>
 
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full py-4 rounded-2xl text-white bg-blue-600 hover:bg-blue-700 font-black text-xl shadow-xl shadow-blue-200 transition transform hover:-translate-y-1"
+              className="w-full py-4 rounded-2xl text-[#e5c07b] bg-gradient-to-r from-[#133c3e] to-[#1a4f52] hover:from-[#0f2d2f] hover:to-[#133c3e] font-black text-xl shadow-xl shadow-[#133c3e]/30 transition transform hover:-translate-y-1 border-2 border-[#e5c07b]"
             >
               {isLoading ? "ĐANG LƯU..." : "💾 LƯU ĐƠN HÀNG MỚI"}
             </button>
@@ -1255,13 +1238,13 @@ const AdminDashboard = ({
         </div>
       )}
 
-      <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 sticky top-2 z-10 flex flex-col sm:flex-row gap-4">
+      <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-200 sticky top-2 z-10 flex flex-col sm:flex-row gap-4">
         <input
           type="text"
-          placeholder="🔍 Tìm tên, SĐT, Mã đơn..."
+          placeholder="🔍 Tìm kiếm Tên, SĐT, Mã đơn của khách..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="flex-1 p-3 border-2 border-gray-200 rounded-xl bg-gray-50 outline-none focus:border-blue-500 focus:bg-white transition"
+          className="flex-1 p-3 border-2 border-gray-200 rounded-xl bg-gray-50 outline-none focus:border-[#133c3e] focus:bg-white transition font-semibold"
         />
         <div className="flex overflow-x-auto gap-2 pb-2 sm:pb-0 scrollbar-hide items-center">
           {["Tất cả", "Chờ xử lý", "Đang may", "Hoàn thành", "Đã giao"].map(
@@ -1271,7 +1254,7 @@ const AdminDashboard = ({
                 onClick={() => setFilterStatus(status)}
                 className={`whitespace-nowrap px-4 py-2 rounded-xl text-sm font-bold transition ${
                   filterStatus === status
-                    ? "bg-gray-800 text-white shadow-md"
+                    ? "bg-[#133c3e] text-[#e5c07b] shadow-md border border-[#e5c07b]"
                     : "bg-gray-100 text-gray-600 hover:bg-gray-200"
                 }`}
               >
@@ -1285,15 +1268,13 @@ const AdminDashboard = ({
       <div className="pb-20">
         {isLoading && customers.length === 0 && (
           <div className="text-center p-10 font-bold text-gray-400">
-            Đang tải dữ liệu tiệm may...
+            Đang tải dữ liệu từ máy chủ...
           </div>
         )}
         {!isLoading && filteredCustomers.length === 0 && !isAdding && (
           <div className="text-center p-16 bg-white rounded-3xl border border-dashed border-gray-300">
             <p className="text-5xl mb-4">🪡</p>
-            <p className="text-gray-500 font-medium">
-              Chưa có đơn hàng nào ở đây cả!
-            </p>
+            <p className="text-gray-500 font-medium">Chưa có đơn hàng nào!</p>
           </div>
         )}
         {filteredCustomers.map((c) => (
@@ -1312,6 +1293,9 @@ const AdminDashboard = ({
   );
 };
 
+// ==========================================
+// MÀN HÌNH KHÁCH HÀNG TRA CỨU
+// ==========================================
 const CustomerLookup = ({ ownerId, showToast }) => {
   const [lookupInfo, setLookupInfo] = useState({ phone: "", orderName: "" });
   const [orderResult, setOrderResult] = useState(null);
@@ -1347,17 +1331,18 @@ const CustomerLookup = ({ ownerId, showToast }) => {
 
   return (
     <div className="max-w-md mx-auto mt-10">
-      <div className="bg-white shadow-2xl shadow-green-100 rounded-3xl p-8 border border-green-50">
-        <h1 className="text-3xl font-black text-green-700 text-center mb-2">
-          TRA CỨU ĐƠN
+      <div className="bg-white shadow-2xl shadow-green-100 rounded-3xl p-8 border border-green-200">
+        <div className="flex justify-center mb-4 text-5xl">🔍</div>
+        <h1 className="text-3xl font-black text-green-700 text-center mb-2 uppercase">
+          TRA CỨU ĐƠN KHÁCH HÀNG
         </h1>
-        <p className="text-center text-gray-500 text-sm mb-8">
-          Kiểm tra tiến độ may đồ của bạn
+        <p className="text-center text-gray-500 text-sm mb-8 font-medium">
+          Nhập đúng thông tin để xem tiến độ may đồ của bạn
         </p>
         <form onSubmit={searchOrder} className="space-y-5">
           <div>
             <label className="text-xs font-bold text-gray-600 uppercase">
-              Số Điện Thoại
+              Số Điện Thoại Đặt May
             </label>
             <input
               type="tel"
@@ -1365,12 +1350,12 @@ const CustomerLookup = ({ ownerId, showToast }) => {
               onChange={(e) =>
                 setLookupInfo({ ...lookupInfo, phone: e.target.value })
               }
-              className="mt-1 w-full p-4 bg-gray-50 border border-gray-200 rounded-xl focus:border-green-500 focus:bg-white outline-none transition"
+              className="mt-1 w-full p-4 bg-gray-50 border border-gray-300 rounded-xl focus:border-green-500 focus:bg-white outline-none transition font-bold text-lg"
             />
           </div>
           <div>
             <label className="text-xs font-bold text-gray-600 uppercase">
-              Mã Đơn Hàng
+              Mã Đơn Hàng Bí Mật
             </label>
             <input
               type="text"
@@ -1378,16 +1363,16 @@ const CustomerLookup = ({ ownerId, showToast }) => {
               onChange={(e) =>
                 setLookupInfo({ ...lookupInfo, orderName: e.target.value })
               }
-              className="mt-1 w-full p-4 bg-gray-50 border border-gray-200 rounded-xl focus:border-green-500 focus:bg-white outline-none transition"
+              className="mt-1 w-full p-4 bg-gray-50 border border-gray-300 rounded-xl focus:border-green-500 focus:bg-white outline-none transition font-mono font-bold text-lg"
               placeholder="VD: NGUYENVANA_123"
             />
           </div>
           <button
             type="submit"
             disabled={lookupLoading}
-            className="w-full py-4 font-black rounded-xl text-white bg-green-600 hover:bg-green-700 shadow-xl shadow-green-200 transition transform hover:-translate-y-1 mt-4"
+            className="w-full py-4 font-black text-lg rounded-xl text-white bg-green-600 hover:bg-green-700 shadow-xl shadow-green-200 transition transform hover:-translate-y-1 mt-4"
           >
-            {lookupLoading ? "ĐANG TÌM..." : "🔍 TRA CỨU NGAY"}
+            {lookupLoading ? "ĐANG TÌM..." : "KIỂM TRA TIẾN ĐỘ NGAY"}
           </button>
         </form>
       </div>
@@ -1407,6 +1392,9 @@ const CustomerLookup = ({ ownerId, showToast }) => {
   );
 };
 
+// ==========================================
+// MÀN HÌNH ĐĂNG NHẬP CHÍNH THỨC
+// ==========================================
 const LoginScreen = ({ setAppRole, OWNER_ID, showToast }) => {
   const [pin, setPin] = useState("");
   const handleAdminLogin = (e) => {
@@ -1414,52 +1402,75 @@ const LoginScreen = ({ setAppRole, OWNER_ID, showToast }) => {
     if (pin === ADMIN_PASSCODE && OWNER_ID) {
       setAppRole("admin");
       localStorage.setItem("appRole", "admin");
-    } else showToast("Mã PIN không đúng.", "error");
+    } else showToast("Sai Mã PIN bảo mật!", "error");
   };
   return (
-    <div className="max-w-sm w-full mx-auto mt-20 p-8 bg-white shadow-2xl rounded-3xl border border-gray-100">
+    <div className="max-w-md w-full mx-auto mt-16 p-6 sm:p-10 bg-white shadow-2xl rounded-[2rem] border border-gray-200">
+      {/* LOGO ĐĂNG NHẬP */}
       <div className="text-center mb-10">
-        <div className="w-16 h-16 bg-blue-600 text-white rounded-2xl flex items-center justify-center text-3xl mx-auto mb-4 shadow-lg shadow-blue-200">
-          ✂️
-        </div>
-        <h1 className="text-2xl font-black text-gray-800">TIỆM MAY NHÀ LÀM</h1>
+        <img
+          src="/LOGO.png"
+          alt="Logo Veston Sĩ Hiền"
+          className="w-32 h-32 mx-auto mb-6 rounded-full shadow-2xl border-4 border-[#e5c07b] object-cover"
+        />
+        <h1 className="text-3xl font-black text-[#133c3e] tracking-tight uppercase">
+          Trung Tâm Veston
+        </h1>
+        <h1 className="text-4xl font-black text-[#e5c07b] mt-1 drop-shadow-sm uppercase">
+          SĨ HIỀN
+        </h1>
+        <p className="text-gray-500 font-bold mt-2 text-sm tracking-widest">
+          EST. 2004
+        </p>
       </div>
-      <div className="space-y-6">
-        <div className="p-5 rounded-2xl bg-gray-50 border border-gray-200 relative overflow-hidden">
-          <div className="absolute top-0 left-0 w-1 h-full bg-blue-500"></div>
-          <h3 className="font-bold text-gray-800 mb-3 text-sm">
-            🔒 ĐĂNG NHẬP CHỦ TIỆM
+
+      <div className="space-y-8">
+        <div className="p-1 rounded-2xl bg-gradient-to-r from-green-400 to-emerald-500 p-[2px]">
+          <div className="bg-white rounded-2xl p-4">
+            <h3 className="font-black text-green-700 mb-2 text-center text-sm uppercase">
+              🚪 DÀNH CHO KHÁCH HÀNG
+            </h3>
+            <p className="text-xs text-center text-gray-500 mb-4">
+              Xem tiến độ may trang phục của bạn
+            </p>
+            <button
+              onClick={() => setAppRole("guest")}
+              className="w-full py-4 font-black text-lg rounded-xl bg-green-50 text-green-700 border-2 border-green-200 hover:bg-green-100 hover:border-green-300 transition shadow-sm"
+            >
+              TRA CỨU ĐƠN HÀNG
+            </button>
+          </div>
+        </div>
+
+        <div className="relative flex py-2 items-center">
+          <div className="flex-grow border-t border-gray-300"></div>
+          <span className="flex-shrink-0 mx-4 text-gray-400 text-xs font-black uppercase tracking-widest">
+            Khu Vực Nội Bộ
+          </span>
+          <div className="flex-grow border-t border-gray-300"></div>
+        </div>
+
+        <div className="p-5 rounded-2xl bg-[#133c3e] border-2 border-[#e5c07b] shadow-xl relative overflow-hidden">
+          <h3 className="font-black text-[#e5c07b] mb-4 text-center text-sm uppercase tracking-wider">
+            🔒 ĐĂNG NHẬP QUẢN LÝ TIỆM
           </h3>
           <form onSubmit={handleAdminLogin} className="flex flex-col gap-3">
             <input
               type="password"
-              placeholder="Nhập PIN (2024)"
+              placeholder="Nhập mã PIN bảo mật"
               value={pin}
               onChange={(e) => setPin(e.target.value)}
-              className="w-full p-3 bg-white border border-gray-300 rounded-xl text-center tracking-[0.5em] font-bold outline-none focus:border-blue-500"
+              className="w-full p-4 bg-white/10 border-2 border-[#e5c07b]/50 text-white rounded-xl text-center tracking-[0.5em] font-bold outline-none focus:border-[#e5c07b] focus:bg-white/20 placeholder-gray-400 transition"
               maxLength={4}
             />
             <button
               type="submit"
-              className="w-full py-3 font-bold rounded-xl bg-gray-800 text-white hover:bg-black transition shadow-md"
+              className="w-full py-4 font-black text-lg rounded-xl bg-[#e5c07b] text-[#133c3e] hover:bg-yellow-500 transition shadow-lg mt-2 uppercase"
             >
-              VÀO QUẢN LÝ
+              VÀO LÀM VIỆC
             </button>
           </form>
         </div>
-        <div className="relative flex py-2 items-center">
-          <div className="flex-grow border-t border-gray-200"></div>
-          <span className="flex-shrink-0 mx-4 text-gray-400 text-xs font-medium">
-            HOẶC
-          </span>
-          <div className="flex-grow border-t border-gray-200"></div>
-        </div>
-        <button
-          onClick={() => setAppRole("guest")}
-          className="w-full py-4 font-bold rounded-2xl bg-green-50 text-green-700 border border-green-200 hover:bg-green-100 transition flex items-center justify-center gap-2"
-        >
-          Tra Cứu Đơn Của Khách
-        </button>
       </div>
     </div>
   );
@@ -1575,19 +1586,17 @@ export default function App() {
         setIsGeneratingProfile(false);
         return;
       }
-
       const res = await fetch(
         `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            // BỘ NÃO ĐÃ ĐƯỢC MỞ RỘNG Ở ĐÂY 👇
             contents: [
               {
                 parts: [
                   {
-                    text: `Là một chuyên gia thiết kế thời trang và thợ may bậc thầy. Dựa trên số đo (cm) của khách: ${promptDetails}. Hãy làm 3 việc: 1. Nhận xét nhanh ưu/khuyết điểm vóc dáng. 2. Tư vấn kiểu dáng quần áo (cổ áo, dáng eo, phom quần/váy) phù hợp nhất để tôn dáng. 3. Đưa ra 1 lưu ý kỹ thuật khi cắt may cho dáng người này. Trả lời chuyên nghiệp, rõ ràng bằng gạch đầu dòng.`,
+                    text: `Là một chuyên gia thiết kế thời trang và thợ may bậc thầy. Dựa trên số đo (cm) của khách: ${promptDetails}. Hãy làm 3 việc: 1. Nhận xét nhanh ưu/khuyết điểm vóc dáng. 2. Tư vấn kiểu dáng quần áo phù hợp nhất. 3. Đưa ra 1 lưu ý kỹ thuật khi cắt may. Trả lời chuyên nghiệp bằng gạch đầu dòng.`,
                   },
                 ],
               },
@@ -1611,24 +1620,19 @@ export default function App() {
         }
       );
       const data = await res.json();
-
-      if (!res.ok) {
+      if (!res.ok)
         setGeneratedProfile(
-          `Lỗi từ Google: ${data.error?.message || "Không rõ nguyên nhân"}`
+          `Lỗi từ AI: ${data.error?.message || "Không rõ nguyên nhân"}`
         );
-      } else if (
-        data.candidates &&
-        data.candidates[0]?.finishReason === "SAFETY"
-      ) {
+      else if (data.candidates && data.candidates[0]?.finishReason === "SAFETY")
         setGeneratedProfile(
-          "Google vẫn chặn do từ khóa nhạy cảm. Bạn hãy thử bỏ trống ô Ngực/Mông rồi bấm lại nhé."
+          "Google chặn do từ khóa nhạy cảm. Bạn hãy thử bỏ trống ô Ngực/Mông rồi bấm lại nhé."
         );
-      } else {
+      else
         setGeneratedProfile(
           data.candidates?.[0]?.content?.parts?.[0]?.text ||
             "Không có kết quả phân tích."
         );
-      }
     } catch (e) {
       setGeneratedProfile(`Lỗi mạng/kết nối: ${e.message}`);
     }
@@ -1733,12 +1737,12 @@ export default function App() {
   if (isLoading && OWNER_ID === null)
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-        <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+        <div className="w-10 h-10 border-4 border-[#133c3e] border-t-[#e5c07b] rounded-full animate-spin"></div>
       </div>
     );
   if (appRole === null)
     return (
-      <div className="min-h-screen bg-gray-100">
+      <div className="min-h-screen bg-gray-50 flex flex-col justify-center pb-10">
         <LoginScreen
           setAppRole={setAppRole}
           OWNER_ID={OWNER_ID}
@@ -1748,7 +1752,7 @@ export default function App() {
     );
 
   return (
-    <div className="min-h-screen bg-gray-100 font-sans pb-10 text-gray-800 relative overflow-hidden">
+    <div className="min-h-screen bg-gray-50 font-sans pb-10 text-gray-800 relative overflow-hidden">
       {toast && (
         <div
           className={`fixed top-5 left-1/2 transform -translate-x-1/2 px-6 py-3 rounded-full shadow-2xl text-white font-bold text-sm z-50 transition-all ${
@@ -1759,23 +1763,26 @@ export default function App() {
         </div>
       )}
 
-      <div className="bg-gray-900 px-4 py-3 flex justify-between items-center shadow-md">
-        <div className="text-white font-bold text-sm flex items-center gap-2">
+      <div className="bg-[#0a1f20] px-4 py-3 flex justify-between items-center shadow-md">
+        <div className="text-[#e5c07b] font-bold text-sm flex items-center gap-2">
           <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>{" "}
-          {appRole === "admin" ? "Chủ Tiệm Đang Quản Lý" : "Khách Hàng Tra Cứu"}
+          {appRole === "admin"
+            ? "Quyền Chủ Tiệm (Admin)"
+            : "Chế Độ Khách Hàng (Chỉ Xem)"}
         </div>
         <button
           onClick={() => {
             setAppRole(null);
             setCustomers([]);
+            localStorage.removeItem("appRole");
           }}
-          className="text-xs text-gray-300 hover:text-white bg-gray-800 px-3 py-1.5 rounded-lg transition"
+          className="text-xs text-gray-300 hover:text-white bg-white/10 px-4 py-2 rounded-lg transition border border-white/20 font-bold"
         >
-          Đăng Xuất
+          Thoát
         </button>
       </div>
 
-      <div className="max-w-5xl mx-auto mt-6 px-4">
+      <div className="max-w-6xl mx-auto mt-6 px-4">
         {appRole === "admin" ? (
           <AdminDashboard
             userId={OWNER_ID}
