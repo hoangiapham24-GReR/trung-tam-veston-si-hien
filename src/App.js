@@ -78,7 +78,7 @@ const generateOrderName = (name, phone) => {
 };
 
 // ==========================================
-// 🚀 TÍNH NĂNG GỬI EMAIL TỰ ĐỘNG
+// 🚀 TÍNH NĂNG GỬI EMAIL TỰ ĐỘNG (GỬI HÓA ĐƠN)
 // ==========================================
 const sendEmailInvoice = async (customer, showToast) => {
   if (!customer.email) {
@@ -308,11 +308,9 @@ const SimpleCropper = ({ imageSrc, onSave, onCancel }) => {
     const img = new Image();
     img.src = imageSrc;
     img.onload = () => {
-      // Nền trong suốt để tránh viền trắng thừa khi bo tròn
       ctx.clearRect(0, 0, 500, 500);
 
       const ratio = 500 / CONTAINER_SIZE;
-      // TÍNH TOÁN THEO CẠNH DÀI NHẤT -> Ảnh luôn nằm trọn trong khung tròn
       const maxDim = Math.max(img.width, img.height);
       const baseScale = CONTAINER_SIZE / maxDim;
       const drawScale = baseScale * zoom * ratio;
@@ -323,7 +321,6 @@ const SimpleCropper = ({ imageSrc, onSave, onCancel }) => {
       const y = 250 - h / 2 + position.y * ratio;
 
       ctx.drawImage(img, x, y, w, h);
-      // LƯU ẢNH PNG ĐỂ GIỮ NỀN TRONG SUỐT BÊN NGOÀI VIỀN TRÒN
       onSave(canvas.toDataURL("image/png"));
     };
   };
@@ -354,7 +351,6 @@ const SimpleCropper = ({ imageSrc, onSave, onCancel }) => {
               position: "absolute",
               top: "50%",
               left: "50%",
-              // SỬ DỤNG MAX-WIDTH THAY VÌ MIN-WIDTH ĐỂ ẢNH THU GỌN VÀO TRONG
               maxWidth: "100%",
               maxHeight: "100%",
               width: "auto",
@@ -367,7 +363,6 @@ const SimpleCropper = ({ imageSrc, onSave, onCancel }) => {
 
         <div className="w-full mt-8 flex items-center gap-4 px-2">
           <span className="text-2xl opacity-60">🔍</span>
-          {/* CHO PHÉP ZOOM OUT (THU NHỎ) XUỐNG 0.5 ĐỂ TẠO PADDING */}
           <input
             type="range"
             min="0.5"
@@ -403,10 +398,154 @@ const SimpleCropper = ({ imageSrc, onSave, onCancel }) => {
   );
 };
 
+// ==========================================
+// 💌 BẢNG CHỌN GỬI TIN NHẮN (ZALO / SMS / EMAIL)
+// ==========================================
+const NotificationModal = ({ customer, onClose, showToast }) => {
+  const [msgType, setMsgType] = useState("done"); // 'done' hoặc 'delay'
+  const [message, setMessage] = useState("");
+
+  useEffect(() => {
+    if (msgType === "done") {
+      setMessage(
+        `Dạ chào ${
+          customer.name
+        }, tiệm Veston Sĩ Hiền xin thông báo đơn hàng [Mã: ${
+          customer.orderName
+        }] của quý khách đã hoàn thiện.\n\nTổng tiền còn nợ: ${formatCurrency(
+          customer.conLai
+        )} VNĐ.\n\nMời quý khách ghé tiệm thử và nhận đồ nhé. Cảm ơn quý khách!`
+      );
+    } else {
+      setMessage(
+        `Dạ chào ${customer.name}, tiệm Veston Sĩ Hiền thành thật xin lỗi quý khách vì sự cố ngoài ý muốn nên đơn hàng [Mã: ${customer.orderName}] sẽ bị trễ hẹn so với dự kiến.\n\nTiệm đang gấp rút hoàn thiện và sẽ báo lại quý khách sớm nhất. Rất mong quý khách thông cảm!`
+      );
+    }
+  }, [msgType, customer]);
+
+  const handleSendSMS = () => {
+    const isIOS =
+      /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+    const separator = isIOS ? "&" : "?";
+    window.location.href = `sms:${
+      customer.phone
+    }${separator}body=${encodeURIComponent(message)}`;
+  };
+
+  const handleSendZalo = () => {
+    // Copy nội dung vào khay nhớ tạm
+    navigator.clipboard
+      .writeText(message)
+      .then(() => {
+        showToast("Đã copy tin nhắn! Đang mở Zalo...", "success");
+        // Định dạng lại số điện thoại cho Zalo
+        let phoneStr = customer.phone.replace(/\D/g, "");
+        if (phoneStr.startsWith("0")) phoneStr = "84" + phoneStr.slice(1);
+        // Mở Zalo
+        window.open(`https://zalo.me/${phoneStr}`, "_blank");
+      })
+      .catch(() => {
+        showToast("Không thể copy tự động. Vui lòng copy thủ công.", "error");
+      });
+  };
+
+  const handleSendEmail = () => {
+    if (!customer.email) {
+      showToast("Khách hàng này chưa lưu Email!", "error");
+      return;
+    }
+    const subject =
+      msgType === "done"
+        ? `[Veston Sĩ Hiền] Thông báo hoàn thiện đơn hàng ${customer.orderName}`
+        : `[Veston Sĩ Hiền] Cập nhật tiến độ đơn hàng ${customer.orderName}`;
+    window.location.href = `mailto:${
+      customer.email
+    }?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(
+      message
+    )}`;
+  };
+
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 p-4 animate-fade-in backdrop-blur-sm">
+      <div className="bg-white p-6 rounded-2xl w-full max-w-md shadow-2xl flex flex-col">
+        <div className="flex justify-between items-center mb-4 border-b pb-3">
+          <h3 className="font-black text-lg text-[#133c3e] flex items-center gap-2">
+            🔔 Gửi Thông Báo Khách Hàng
+          </h3>
+          <button
+            onClick={onClose}
+            className="text-gray-400 hover:text-red-500 font-bold text-xl transition"
+          >
+            ✕
+          </button>
+        </div>
+
+        <div className="flex gap-2 mb-4 bg-gray-100 p-1 rounded-xl">
+          <button
+            onClick={() => setMsgType("done")}
+            className={`flex-1 py-2 text-sm font-bold rounded-lg transition ${
+              msgType === "done"
+                ? "bg-green-600 text-white shadow-md"
+                : "text-gray-500 hover:bg-gray-200"
+            }`}
+          >
+            ✅ Đã may xong
+          </button>
+          <button
+            onClick={() => setMsgType("delay")}
+            className={`flex-1 py-2 text-sm font-bold rounded-lg transition ${
+              msgType === "delay"
+                ? "bg-orange-500 text-white shadow-md"
+                : "text-gray-500 hover:bg-gray-200"
+            }`}
+          >
+            ⚠️ Trễ hẹn
+          </button>
+        </div>
+
+        <div className="mb-4">
+          <label className="text-xs font-bold text-gray-500 mb-1 block uppercase tracking-wider">
+            Nội dung tin nhắn (Có thể sửa)
+          </label>
+          <textarea
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            className="w-full h-36 p-3 bg-blue-50/50 border border-blue-200 rounded-xl text-sm text-gray-800 focus:ring-2 focus:ring-blue-400 outline-none leading-relaxed resize-none"
+          ></textarea>
+        </div>
+
+        <div className="space-y-2">
+          <button
+            onClick={handleSendZalo}
+            className="w-full py-3 bg-blue-500 hover:bg-blue-600 text-white font-bold rounded-xl shadow-md transition flex justify-center items-center gap-2"
+          >
+            <span className="text-lg">💬</span> Gửi qua Zalo (Khuyên dùng)
+          </button>
+          <div className="flex gap-2">
+            <button
+              onClick={handleSendSMS}
+              className="flex-1 py-3 bg-green-50 text-green-700 border border-green-200 hover:bg-green-100 font-bold rounded-xl shadow-sm transition flex justify-center items-center gap-2"
+            >
+              📱 Gửi SMS
+            </button>
+            <button
+              onClick={handleSendEmail}
+              className="flex-1 py-3 bg-gray-50 text-gray-700 border border-gray-200 hover:bg-gray-100 font-bold rounded-xl shadow-sm transition flex justify-center items-center gap-2"
+            >
+              ✉️ Gửi Email
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 // BẢN HIỂN THỊ ĐƠN HÀNG
 const CustomerCard = ({ customer, ownerId, appId, db, showToast, role }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const [isNotifying, setIsNotifying] = useState(false); // Trạng thái mở bảng nhắn tin
   const [editedCustomer, setEditedCustomer] = useState({ ...customer });
   const [isSaving, setIsSaving] = useState(false);
   const isAdmin = role === "admin";
@@ -504,7 +643,16 @@ const CustomerCard = ({ customer, ownerId, appId, db, showToast, role }) => {
   );
 
   return (
-    <div className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow duration-300 border border-gray-200 overflow-hidden mb-4">
+    <div className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow duration-300 border border-gray-200 overflow-hidden mb-4 relative">
+      {/* Modal Nhắn Tin */}
+      {isNotifying && (
+        <NotificationModal
+          customer={customer}
+          onClose={() => setIsNotifying(false)}
+          showToast={showToast}
+        />
+      )}
+
       <div
         className={`p-4 cursor-pointer flex justify-between items-center transition-colors ${
           isExpanded
@@ -564,6 +712,17 @@ const CustomerCard = ({ customer, ownerId, appId, db, showToast, role }) => {
         <div className="p-5 bg-gray-50/50">
           {isAdmin && (
             <div className="flex flex-wrap justify-end gap-2 mb-5">
+              {/* NÚT BÁO KHÁCH MỚI */}
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsNotifying(true);
+                }}
+                className="px-4 py-2 text-sm font-bold rounded-lg bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200 transition shadow-sm animate-pulse"
+              >
+                🔔 Báo Khách
+              </button>
+
               <button
                 onClick={(e) => {
                   e.stopPropagation();
@@ -571,7 +730,7 @@ const CustomerCard = ({ customer, ownerId, appId, db, showToast, role }) => {
                 }}
                 className="px-4 py-2 text-sm font-bold rounded-lg bg-teal-50 text-teal-700 hover:bg-teal-100 border border-teal-200 transition shadow-sm"
               >
-                ✉️ Gửi Email
+                🧾 Gửi Hóa Đơn Email
               </button>
               <button
                 onClick={(e) => {
