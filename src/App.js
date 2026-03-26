@@ -451,18 +451,15 @@ const NotificationModal = ({ customer, onClose, showToast }) => {
 
   const handleSendEmail = () => {
     if (!customer.email) {
-      showToast("Khách hàng này chưa lưu Email!", "error");
-      return;
+        showToast("Khách hàng này chưa lưu Email!", "error");
+        return;
     }
-    const subject =
-      msgType === "done"
-        ? `[Veston Sĩ Hiền] Thông báo hoàn thiện đơn hàng ${customer.orderName}`
-        : `[Veston Sĩ Hiền] Cập nhật tiến độ đơn hàng ${customer.orderName}`;
-    window.location.href = `mailto:${
-      customer.email
-    }?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(
-      message
-    )}`;
+    const subject = msgType === 'done' ? `[Veston Sĩ Hiền] Thông báo hoàn thiện đơn hàng ${customer.orderName}` : `[Veston Sĩ Hiền] Cập nhật tiến độ đơn hàng ${customer.orderName}`;
+    
+    // TUYỆT CHIÊU: Ép mở tab mới vào thẳng trang web Gmail, điền sẵn thông tin!
+    const gmailWebUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${customer.email}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(message)}`;
+    window.open(gmailWebUrl, '_blank');
+};
   };
 
   return (
