@@ -274,13 +274,16 @@ const ImageUploadInput = ({ label, value, onChange }) => {
 };
 
 // ==========================================
-// 🎨 BỘ CÔNG CỤ CẮT & CĂN CHỈNH ẢNH (NHƯ FACEBOOK)
+// 🎨 BỘ CÔNG CỤ CẮT & CĂN CHỈNH ẢNH CỠ LỚN (PRO CROPPER)
 // ==========================================
 const SimpleCropper = ({ imageSrc, onSave, onCancel }) => {
   const [zoom, setZoom] = useState(1);
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
   const [startPos, setStartPos] = useState({ x: 0, y: 0 });
+
+  // Đã mở rộng kích thước khung cắt từ 256px lên 300px
+  const CONTAINER_SIZE = 300;
 
   const onPointerDown = (e) => {
     setIsDragging(true);
@@ -306,14 +309,12 @@ const SimpleCropper = ({ imageSrc, onSave, onCancel }) => {
     const img = new Image();
     img.src = imageSrc;
     img.onload = () => {
-      // Vẽ nền trắng
       ctx.fillStyle = "#fff";
       ctx.fillRect(0, 0, 500, 500);
 
-      // Tính toán tỷ lệ dựa trên thao tác người dùng
-      const ratio = 500 / 256;
+      const ratio = 500 / CONTAINER_SIZE;
       const minDim = Math.min(img.width, img.height);
-      const baseScale = 256 / minDim;
+      const baseScale = CONTAINER_SIZE / minDim;
       const drawScale = baseScale * zoom * ratio;
 
       const w = img.width * drawScale;
@@ -328,14 +329,15 @@ const SimpleCropper = ({ imageSrc, onSave, onCancel }) => {
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/85 p-4 animate-fade-in backdrop-blur-sm">
-      <div className="bg-white p-6 rounded-[2rem] w-full max-w-sm flex flex-col items-center shadow-2xl">
-        <h3 className="font-black text-xl mb-6 text-[#133c3e] uppercase tracking-wide border-b-2 border-[#e5c07b] pb-2">
+      {/* Mở rộng max-w-sm thành max-w-md để bảng to hơn */}
+      <div className="bg-white p-8 rounded-[2rem] w-full max-w-md flex flex-col items-center shadow-2xl">
+        <h3 className="font-black text-2xl mb-8 text-[#133c3e] uppercase tracking-wide border-b-2 border-[#e5c07b] pb-2">
           Căn Chỉnh Logo
         </h3>
 
-        {/* Vùng kéo thả ảnh */}
+        {/* Vùng kéo thả ảnh đã được phóng to lên 300x300px */}
         <div
-          className="relative w-64 h-64 overflow-hidden rounded-full border-4 border-[#e5c07b] bg-gray-100 cursor-move shadow-[inset_0_0_20px_rgba(0,0,0,0.2)]"
+          className="relative w-[300px] h-[300px] overflow-hidden rounded-full border-[5px] border-[#e5c07b] bg-gray-100 cursor-move shadow-[inset_0_0_20px_rgba(0,0,0,0.3)]"
           onMouseDown={onPointerDown}
           onMouseMove={onPointerMove}
           onMouseUp={onPointerUp}
@@ -363,8 +365,8 @@ const SimpleCropper = ({ imageSrc, onSave, onCancel }) => {
           <div className="absolute inset-0 pointer-events-none border-[15px] border-white/20 rounded-full"></div>
         </div>
 
-        {/* Thanh Zoom */}
-        <div className="w-full mt-8 flex items-center gap-4 px-2">
+        {/* Thanh Zoom bự hơn */}
+        <div className="w-full mt-10 flex items-center gap-4 px-2">
           <span className="text-2xl opacity-60">🔍</span>
           <input
             type="range"
@@ -378,22 +380,22 @@ const SimpleCropper = ({ imageSrc, onSave, onCancel }) => {
           <span className="text-3xl">🔍</span>
         </div>
 
-        <p className="text-xs text-gray-500 mt-4 mb-8 font-bold uppercase tracking-wider bg-gray-100 px-4 py-2 rounded-full">
-          👆 Dùng 1 ngón tay kéo để di chuyển ảnh
+        <p className="text-sm text-gray-500 mt-6 mb-8 font-bold uppercase tracking-wider bg-gray-100 px-5 py-3 rounded-full shadow-sm">
+          👆 Dùng 1 ngón tay kéo để di chuyển
         </p>
 
-        <div className="flex gap-4 w-full">
+        <div className="flex gap-4 w-full mt-2">
           <button
             onClick={onCancel}
-            className="flex-1 py-4 bg-gray-100 text-gray-600 font-black rounded-2xl hover:bg-gray-200 transition"
+            className="flex-1 py-4 text-lg bg-gray-100 text-gray-600 font-black rounded-2xl hover:bg-gray-200 transition"
           >
             HỦY
           </button>
           <button
             onClick={applyCrop}
-            className="flex-[2] py-4 bg-[#133c3e] text-[#e5c07b] font-black rounded-2xl hover:bg-[#0f2d2f] border border-[#e5c07b] transition shadow-lg shadow-[#133c3e]/30"
+            className="flex-[2] py-4 text-lg bg-[#133c3e] text-[#e5c07b] font-black rounded-2xl hover:bg-[#0f2d2f] border-2 border-[#e5c07b] transition shadow-xl shadow-[#133c3e]/30"
           >
-            LƯU AVATAR
+            LƯU LOGO MỚI
           </button>
         </div>
       </div>
@@ -1027,7 +1029,7 @@ const AdminDashboard = ({
 
   return (
     <div className="space-y-6">
-      {/* Nếu đang chọn ảnh, hiển thị Bảng Cắt Ảnh (Cropper) */}
+      {/* CÔNG CỤ CẮT ẢNH HIỂN THỊ KHI CHỌN FILE */}
       {tempLogo && (
         <SimpleCropper
           imageSrc={tempLogo}
