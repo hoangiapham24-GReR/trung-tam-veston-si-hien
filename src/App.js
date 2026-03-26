@@ -274,7 +274,7 @@ const ImageUploadInput = ({ label, value, onChange }) => {
 };
 
 // ==========================================
-// 🎨 BỘ CÔNG CỤ CẮT & CĂN CHỈNH ẢNH (BẢO TOÀN CHI TIẾT)
+// 🎨 BỘ CÔNG CỤ CẮT & CĂN CHỈNH ẢNH
 // ==========================================
 const SimpleCropper = ({ imageSrc, onSave, onCancel }) => {
   const [zoom, setZoom] = useState(1);
@@ -399,7 +399,7 @@ const SimpleCropper = ({ imageSrc, onSave, onCancel }) => {
 };
 
 // ==========================================
-// 💌 BẢNG CHỌN GỬI TIN NHẮN (ZALO / SMS / EMAIL THÔNG MINH)
+// 💌 BẢNG CHỌN GỬI TIN NHẮN
 // ==========================================
 const NotificationModal = ({ customer, onClose, showToast }) => {
   const [msgType, setMsgType] = useState("done");
@@ -1815,12 +1815,12 @@ const LoginScreen = ({ setAppView, OWNER_ID, showToast, shopLogo }) => {
 };
 
 // ==========================================
-// 🌟 MẶT TIỀN - TRANG CHỦ (LANDING PAGE) 🌟
+// 🌟 MẶT TIỀN - TRANG CHỦ (LANDING PAGE FULL) 🌟
 // ==========================================
 const LandingPage = ({ setAppView, shopLogo }) => {
   return (
     <div className="bg-white min-h-screen font-sans">
-      {/* Thanh Điều Hướng */}
+      {/* THANH ĐIỀU HƯỚNG */}
       <nav className="bg-[#133c3e] px-4 py-3 sm:px-8 sm:py-4 flex justify-between items-center shadow-lg sticky top-0 z-50">
         <div className="flex items-center gap-3">
           <img
@@ -1828,7 +1828,7 @@ const LandingPage = ({ setAppView, shopLogo }) => {
             alt="Logo"
             className="w-10 h-10 sm:w-12 sm:h-12 rounded-full border-2 border-[#e5c07b] bg-white object-cover"
           />
-          <span className="text-[#e5c07b] font-black text-lg sm:text-2xl tracking-wider uppercase">
+          <span className="text-[#e5c07b] font-black text-lg sm:text-xl tracking-widest uppercase">
             Sĩ Hiền
           </span>
         </div>
@@ -1842,7 +1842,7 @@ const LandingPage = ({ setAppView, shopLogo }) => {
         </div>
       </nav>
 
-      {/* Banner Chính */}
+      {/* BANNER CHÍNH (HERO) */}
       <div className="bg-[#133c3e] text-center py-20 px-4 relative overflow-hidden">
         <img
           src={shopLogo}
@@ -1865,7 +1865,6 @@ const LandingPage = ({ setAppView, shopLogo }) => {
         >
           ✂️ Kiểm Tra Tiến Độ May
         </button>
-        {/* Lưới background trang trí */}
         <div
           className="absolute inset-0 opacity-5"
           style={{
@@ -1876,50 +1875,227 @@ const LandingPage = ({ setAppView, shopLogo }) => {
         ></div>
       </div>
 
-      {/* Ba cột Dịch vụ */}
-      <div className="py-20 px-4 max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
-        <div className="text-center p-8 bg-gray-50 rounded-3xl shadow-sm border border-gray-100 hover:shadow-xl transition transform hover:-translate-y-2">
-          <div className="text-6xl mb-6 drop-shadow-md">📐</div>
-          <h3 className="text-xl font-black text-[#133c3e] mb-4 uppercase tracking-wide">
-            Cắt May Bespoke
-          </h3>
-          <p className="text-gray-600 font-medium leading-relaxed">
-            Đo ni đóng giày chuẩn xác đến từng milimet. Tôn vinh trọn vẹn vóc
-            dáng người mặc với kỹ thuật rập độc quyền.
+      {/* PHẦN 1: CÂU CHUYỆN THƯƠNG HIỆU & TIỂU SỬ */}
+      <div className="py-20 px-6 sm:px-10 max-w-6xl mx-auto flex flex-col md:flex-row gap-12 items-center">
+        <div className="flex-1 space-y-6">
+          <h2 className="text-3xl sm:text-4xl font-black text-[#133c3e] uppercase tracking-wide border-b-4 border-[#e5c07b] inline-block pb-2">
+            Câu Chuyện Của Chúng Tôi
+          </h2>
+          <p className="text-gray-600 leading-relaxed text-lg text-justify">
+            Được thành lập từ năm 2004, **Trung Tâm Veston Sĩ Hiền** khởi đầu từ
+            một xưởng may nhỏ với niềm đam mê cháy bỏng dành cho nghệ thuật may
+            đo thủ công (Bespoke tailoring).
           </p>
+          <p className="text-gray-600 leading-relaxed text-lg text-justify">
+            Trải qua hơn hai thập kỷ thăng trầm cùng vô số sự thay đổi của các
+            xu hướng thời trang, Sĩ Hiền vẫn kiên định với triết lý: *"Trang
+            phục không chỉ để mặc, mà còn để kể câu chuyện về người đàn ông
+            khoác lên nó"*. Mỗi bộ Suit tại Trung tâm đều được đo vẽ tỉ mỉ, cắt
+            rập độc quyền và thực hiện hoàn toàn thủ công bởi những nghệ nhân
+            lành nghề nhất.
+          </p>
+          <div className="flex gap-6 pt-4">
+            <div className="text-center">
+              <span className="block text-3xl font-black text-[#e5c07b]">
+                20+
+              </span>
+              <span className="text-sm font-bold text-gray-500 uppercase">
+                Năm Kinh Nghiệm
+              </span>
+            </div>
+            <div className="text-center border-l-2 border-gray-200 pl-6">
+              <span className="block text-3xl font-black text-[#e5c07b]">
+                5000+
+              </span>
+              <span className="text-sm font-bold text-gray-500 uppercase">
+                Khách Hàng Tin Tưởng
+              </span>
+            </div>
+          </div>
         </div>
-        <div className="text-center p-8 bg-gray-50 rounded-3xl shadow-sm border border-gray-100 hover:shadow-xl transition transform hover:-translate-y-2">
-          <div className="text-6xl mb-6 drop-shadow-md">🧵</div>
-          <h3 className="text-xl font-black text-[#133c3e] mb-4 uppercase tracking-wide">
-            Vải Ngoại Nhập
-          </h3>
-          <p className="text-gray-600 font-medium leading-relaxed">
-            Bộ sưu tập vải len, lụa, linen cao cấp được tuyển chọn khắt khe từ
-            các xưởng dệt lừng danh tại Ý và Anh Quốc.
-          </p>
-        </div>
-        <div className="text-center p-8 bg-gray-50 rounded-3xl shadow-sm border border-gray-100 hover:shadow-xl transition transform hover:-translate-y-2">
-          <div className="text-6xl mb-6 drop-shadow-md">👑</div>
-          <h3 className="text-xl font-black text-[#133c3e] mb-4 uppercase tracking-wide">
-            Bảo Hành Dài Hạn
-          </h3>
-          <p className="text-gray-600 font-medium leading-relaxed">
-            Cam kết đồng hành cùng trang phục của bạn. Hỗ trợ chỉnh sửa vừa vặn
-            theo sự thay đổi form dáng hoàn toàn miễn phí.
-          </p>
+        <div className="flex-1 w-full relative">
+          <div className="absolute inset-0 bg-[#e5c07b] rounded-3xl transform translate-x-4 translate-y-4"></div>
+          <img
+            src="https://images.unsplash.com/photo-1594938298596-af62f3ab71c8?q=80&w=1000&auto=format&fit=crop"
+            alt="Thợ may Veston Sĩ Hiền"
+            className="relative z-10 w-full h-auto rounded-3xl shadow-xl object-cover grayscale-[20%]"
+          />
         </div>
       </div>
 
-      {/* Chân trang - Footer */}
+      {/* PHẦN 2: DANH MỤC SẢN PHẨM & DỊCH VỤ */}
+      <div className="bg-gray-50 py-20 px-6 sm:px-10">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl sm:text-4xl font-black text-[#133c3e] uppercase tracking-wide">
+              Dịch Vụ Chuyên Biệt
+            </h2>
+            <div className="w-24 h-1 bg-[#e5c07b] mx-auto mt-4"></div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            {/* Box 1 */}
+            <div className="bg-white rounded-3xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-2xl transition duration-300 group">
+              <div className="h-48 overflow-hidden">
+                <img
+                  src="https://images.unsplash.com/photo-1593030761757-71fae45fa0e7?q=80&w=800&auto=format&fit=crop"
+                  alt="Veston Doanh Nhân"
+                  className="w-full h-full object-cover group-hover:scale-110 transition duration-500"
+                />
+              </div>
+              <div className="p-6 text-center">
+                <h3 className="text-xl font-black text-[#133c3e] mb-2 uppercase">
+                  Veston Doanh Nhân
+                </h3>
+                <p className="text-gray-500 text-sm">
+                  Sang trọng, quyền lực và đẳng cấp. Phù hợp cho các cuộc họp,
+                  hội nghị và gặp gỡ đối tác.
+                </p>
+              </div>
+            </div>
+            {/* Box 2 */}
+            <div className="bg-white rounded-3xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-2xl transition duration-300 group">
+              <div className="h-48 overflow-hidden">
+                <img
+                  src="https://images.unsplash.com/photo-1593030109033-911e05d0d829?q=80&w=800&auto=format&fit=crop"
+                  alt="Veston Cưới"
+                  className="w-full h-full object-cover group-hover:scale-110 transition duration-500"
+                />
+              </div>
+              <div className="p-6 text-center">
+                <h3 className="text-xl font-black text-[#133c3e] mb-2 uppercase">
+                  Veston Chú Rể
+                </h3>
+                <p className="text-gray-500 text-sm">
+                  Lịch lãm và nổi bật trong ngày trọng đại. Thiết kế riêng tôn
+                  lên vẻ nam tính hoàn hảo nhất.
+                </p>
+              </div>
+            </div>
+            {/* Box 3 */}
+            <div className="bg-white rounded-3xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-2xl transition duration-300 group">
+              <div className="h-48 overflow-hidden">
+                <img
+                  src="https://images.unsplash.com/photo-1603252109303-2751441dd157?q=80&w=800&auto=format&fit=crop"
+                  alt="Sơ mi cao cấp"
+                  className="w-full h-full object-cover group-hover:scale-110 transition duration-500"
+                />
+              </div>
+              <div className="p-6 text-center">
+                <h3 className="text-xl font-black text-[#133c3e] mb-2 uppercase">
+                  Sơ Mi May Đo
+                </h3>
+                <p className="text-gray-500 text-sm">
+                  Sử dụng vải cotton, lụa chống nhăn cao cấp. Đo ni chuẩn xác
+                  theo form cổ, vai và tay của bạn.
+                </p>
+              </div>
+            </div>
+            {/* Box 4 */}
+            <div className="bg-white rounded-3xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-2xl transition duration-300 group">
+              <div className="h-48 overflow-hidden">
+                <img
+                  src="https://images.unsplash.com/photo-1594938328870-9323eb22201b?q=80&w=800&auto=format&fit=crop"
+                  alt="Quần tây"
+                  className="w-full h-full object-cover group-hover:scale-110 transition duration-500"
+                />
+              </div>
+              <div className="p-6 text-center">
+                <h3 className="text-xl font-black text-[#133c3e] mb-2 uppercase">
+                  Quần Tây Cao Cấp
+                </h3>
+                <p className="text-gray-500 text-sm">
+                  Đứng dáng, giữ ly tốt và cực kỳ thoải mái khi vận động. Chi
+                  tiết tinh tế đến từng con đỉa.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* PHẦN 3: THÔNG TIN LIÊN HỆ & BẢN ĐỒ */}
+      <div className="py-20 px-6 sm:px-10 max-w-6xl mx-auto">
+        <div className="bg-[#133c3e] rounded-[3rem] p-8 sm:p-12 shadow-2xl relative overflow-hidden flex flex-col md:flex-row gap-10">
+          <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]"></div>
+
+          <div className="flex-1 relative z-10">
+            <h2 className="text-3xl sm:text-4xl font-black text-[#e5c07b] uppercase mb-8">
+              Liên Hệ Sĩ Hiền
+            </h2>
+
+            <div className="space-y-6 text-white text-lg">
+              <div className="flex items-start gap-4">
+                <span className="text-3xl">📍</span>
+                <div>
+                  <h4 className="font-bold text-[#e5c07b] uppercase text-sm">
+                    Địa chỉ Trung tâm
+                  </h4>
+                  <p>
+                    123 Đường Số 1, Phường ABC, Quận XYZ
+                    <br />
+                    Thành phố Hồ Chí Minh
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-start gap-4">
+                <span className="text-3xl">📞</span>
+                <div>
+                  <h4 className="font-bold text-[#e5c07b] uppercase text-sm">
+                    Hotline Tư Vấn
+                  </h4>
+                  <p className="font-mono text-xl font-bold">090.xxxx.xxx</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-4">
+                <span className="text-3xl">⏰</span>
+                <div>
+                  <h4 className="font-bold text-[#e5c07b] uppercase text-sm">
+                    Giờ mở cửa
+                  </h4>
+                  <p>
+                    Tất cả các ngày trong tuần
+                    <br />
+                    08:00 Sáng - 20:00 Tối
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex-1 relative z-10 bg-white/10 rounded-3xl p-2 border border-white/20 backdrop-blur-sm">
+            {/* Placeholder Bản đồ Google Maps - Bạn có thể thay link src iframe bằng link thực tế của tiệm */}
+            <iframe
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3919.31758509748!2d106.6961448147491!3d10.786968092314545!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31752f385570472f%3A0x1787491df0ed8d6a!2sNotre%20Dame%20Cathedral%20of%20Saigon!5e0!3m2!1sen!2s!4v1655182046830!5m2!1sen!2s"
+              width="100%"
+              height="100%"
+              style={{ border: 0, minHeight: "300px", borderRadius: "1.5rem" }}
+              allowFullScreen=""
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              title="Bản đồ Sĩ Hiền"
+            ></iframe>
+          </div>
+        </div>
+      </div>
+
+      {/* CHÂN TRANG - FOOTER */}
       <footer className="bg-[#0a1f20] text-center py-10 px-4 relative">
-        <h2 className="text-2xl font-black text-[#e5c07b] mb-2 uppercase tracking-widest">
+        <img
+          src={shopLogo}
+          alt="Logo"
+          className="w-16 h-16 mx-auto rounded-full border-2 border-[#e5c07b] mb-4 object-cover"
+        />
+        <h2 className="text-xl font-black text-[#e5c07b] mb-2 uppercase tracking-widest">
           Trung Tâm Veston Sĩ Hiền
         </h2>
-        <p className="text-gray-400 text-sm mb-8 font-medium">
-          Khẳng định đẳng cấp quý ông từ năm 2004
+        <p className="text-gray-400 text-sm mb-6 font-medium">
+          Bản quyền © {new Date().getFullYear()} thuộc về Veston Sĩ Hiền. Mọi
+          quyền được bảo lưu.
         </p>
-        <div className="flex justify-center border-t border-gray-800 pt-8 mt-8">
-          {/* NÚT QUẢN LÝ BÍ MẬT */}
+
+        <div className="flex justify-center border-t border-gray-800 pt-6 mt-6">
+          {/* NÚT QUẢN LÝ BÍ MẬT DÀNH CHO ADMIN */}
           <button
             onClick={() => setAppView("login")}
             className="text-gray-600 hover:text-[#e5c07b] transition flex items-center gap-2 text-xs font-bold uppercase tracking-wider px-4 py-2 rounded-lg hover:bg-white/5"
@@ -2002,7 +2178,7 @@ export default function App() {
             if (localStorage.getItem("appRole") === "admin") {
               setAppView("admin");
             } else {
-              setAppView("landing"); // Mặc định mở Trang Chủ
+              setAppView("landing");
             }
             setIsLoading(false);
           } else await signInAnonymously(auth);
