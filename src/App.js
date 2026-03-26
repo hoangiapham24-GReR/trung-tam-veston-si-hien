@@ -273,7 +273,7 @@ const ImageUploadInput = ({ label, value, onChange }) => {
   );
 };
 
-// BẢN HIỂN THỊ ĐƠN HÀNG (SẼ ẨN NÚT SỬA/XÓA NẾU LÀ KHÁCH)
+// BẢN HIỂN THỊ ĐƠN HÀNG
 const CustomerCard = ({ customer, ownerId, appId, db, showToast, role }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -847,6 +847,7 @@ const AdminDashboard = ({
   generateFitProfile,
   isGeneratingProfile,
   generatedProfile,
+  shopLogo,
 }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("Tất cả");
@@ -869,16 +870,71 @@ const AdminDashboard = ({
     0
   );
 
+  // TÍNH NĂNG ĐỔI LOGO TRỰC TIẾP TRÊN WEB
+  const handleLogoChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    showToast("Đang tải Logo lên máy chủ...", "success");
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = (event) => {
+      const img = new Image();
+      img.src = event.target.result;
+      img.onload = async () => {
+        const canvas = document.createElement("canvas");
+        // Tự động căn giữa và cắt thành hình vuông chuẩn (500x500px)
+        const size = Math.min(img.width, img.height);
+        canvas.width = 500;
+        canvas.height = 500;
+        const ctx = canvas.getContext("2d");
+        const sx = (img.width - size) / 2;
+        const sy = (img.height - size) / 2;
+        ctx.drawImage(img, sx, sy, size, size, 0, 0, 500, 500);
+        const base64 = canvas.toDataURL("image/jpeg", 0.9);
+
+        try {
+          await setDoc(
+            doc(db, "public_settings", appId),
+            { logo: base64 },
+            { merge: true }
+          );
+          showToast("Cập nhật Logo thành công rực rỡ!", "success");
+        } catch (err) {
+          showToast("Lỗi lưu logo: " + err.message, "error");
+        }
+      };
+    };
+  };
+
   return (
     <div className="space-y-6">
       <header className="flex flex-col sm:flex-row justify-between items-center bg-[#133c3e] p-6 rounded-2xl shadow-xl border-b-4 border-[#e5c07b]">
         <div className="flex items-center gap-4">
-          {/* LOGO GÓC TRÁI MÀN HÌNH QUẢN LÝ - LINK DIRECT */}
-          <img
-            src="https://i.postimg.cc/JhTTtmTt/LOGO.jpg"
-            alt="Logo"
-            className="w-16 h-16 rounded-full border-2 border-[#e5c07b] shadow-md bg-white object-cover"
-          />
+          {/* NÚT BẤM ĐỂ THAY ĐỔI LOGO */}
+          <label
+            className="cursor-pointer relative group block w-16 h-16 rounded-full border-2 border-[#e5c07b] shadow-md bg-white overflow-hidden flex-shrink-0"
+            title="Bấm vào để đổi Logo"
+          >
+            <input
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={handleLogoChange}
+            />
+            <img
+              src={shopLogo}
+              alt="Logo Tiệm"
+              className="w-full h-full object-cover group-hover:opacity-40 transition duration-300"
+            />
+            <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 bg-black/40 transition duration-300">
+              <span className="text-white text-[10px] font-black tracking-wider text-center">
+                ĐỔI
+                <br />
+                LOGO
+              </span>
+            </div>
+          </label>
+
           <div>
             <h1 className="text-2xl font-black text-[#e5c07b] tracking-wide uppercase">
               Trung Tâm Veston Sĩ Hiền
@@ -1296,7 +1352,7 @@ const AdminDashboard = ({
 // ==========================================
 // MÀN HÌNH KHÁCH HÀNG TRA CỨU
 // ==========================================
-const CustomerLookup = ({ ownerId, showToast }) => {
+const CustomerLookup = ({ ownerId, showToast, shopLogo }) => {
   const [lookupInfo, setLookupInfo] = useState({ phone: "", orderName: "" });
   const [orderResult, setOrderResult] = useState(null);
   const [lookupLoading, setLookupLoading] = useState(false);
@@ -1332,7 +1388,13 @@ const CustomerLookup = ({ ownerId, showToast }) => {
   return (
     <div className="max-w-md mx-auto mt-10">
       <div className="bg-white shadow-2xl shadow-green-100 rounded-3xl p-8 border border-green-200">
-        <div className="flex justify-center mb-4 text-5xl">🔍</div>
+        <div className="flex justify-center mb-6">
+          <img
+            src={shopLogo}
+            alt="Logo"
+            className="w-20 h-20 rounded-full border-4 border-green-200 shadow-md object-cover"
+          />
+        </div>
         <h1 className="text-3xl font-black text-green-700 text-center mb-2 uppercase">
           TRA CỨU ĐƠN KHÁCH HÀNG
         </h1>
@@ -1395,7 +1457,7 @@ const CustomerLookup = ({ ownerId, showToast }) => {
 // ==========================================
 // MÀN HÌNH ĐĂNG NHẬP CHÍNH THỨC
 // ==========================================
-const LoginScreen = ({ setAppRole, OWNER_ID, showToast }) => {
+const LoginScreen = ({ setAppRole, OWNER_ID, showToast, shopLogo }) => {
   const [pin, setPin] = useState("");
   const handleAdminLogin = (e) => {
     e.preventDefault();
@@ -1406,12 +1468,12 @@ const LoginScreen = ({ setAppRole, OWNER_ID, showToast }) => {
   };
   return (
     <div className="max-w-md w-full mx-auto mt-16 p-6 sm:p-10 bg-white shadow-2xl rounded-[2rem] border border-gray-200">
-      {/* LOGO ĐĂNG NHẬP - LINK DIRECT */}
+      {/* LOGO HIỂN THỊ TRỰC TIẾP TỪ FIREBASE */}
       <div className="text-center mb-10">
         <img
-          src="https://i.postimg.cc/JhTTtmTt/LOGO.jpg"
+          src={shopLogo}
           alt="Logo Veston Sĩ Hiền"
-          className="w-32 h-32 mx-auto mb-6 rounded-full shadow-2xl border-4 border-[#e5c07b] object-cover"
+          className="w-32 h-32 mx-auto mb-6 rounded-full shadow-2xl border-4 border-[#e5c07b] object-cover bg-white"
         />
         <h1 className="text-3xl font-black text-[#133c3e] tracking-tight uppercase">
           Trung Tâm Veston
@@ -1516,6 +1578,11 @@ export default function App() {
   const [isGeneratingProfile, setIsGeneratingProfile] = useState(false);
   const [generatedProfile, setGeneratedProfile] = useState(null);
 
+  // STATE LƯU TRỮ LOGO
+  const [shopLogo, setShopLogo] = useState(
+    "https://i.postimg.cc/JhTTtmTt/LOGO.jpg"
+  );
+
   const showToast = useCallback((message, type = "success") => {
     setToast({ message, type });
     setTimeout(() => setToast(null), 4000);
@@ -1527,6 +1594,14 @@ export default function App() {
         const app = initializeApp(firebaseConfig);
         db = getFirestore(app);
         auth = getAuth(app);
+
+        // Lắng nghe và tải Logo từ máy chủ (Cập nhật mọi nơi ngay lập tức)
+        onSnapshot(doc(db, "public_settings", appId), (docSnap) => {
+          if (docSnap.exists() && docSnap.data().logo) {
+            setShopLogo(docSnap.data().logo);
+          }
+        });
+
         const unsubscribe = onAuthStateChanged(auth, async (user) => {
           if (user) {
             OWNER_ID = user.uid;
@@ -1747,6 +1822,7 @@ export default function App() {
           setAppRole={setAppRole}
           OWNER_ID={OWNER_ID}
           showToast={showToast}
+          shopLogo={shopLogo}
         />
       </div>
     );
@@ -1798,9 +1874,14 @@ export default function App() {
             generateFitProfile={generateFitProfile}
             isGeneratingProfile={isGeneratingProfile}
             generatedProfile={generatedProfile}
+            shopLogo={shopLogo}
           />
         ) : (
-          <CustomerLookup ownerId={OWNER_ID} showToast={showToast} />
+          <CustomerLookup
+            ownerId={OWNER_ID}
+            showToast={showToast}
+            shopLogo={shopLogo}
+          />
         )}
       </div>
     </div>
