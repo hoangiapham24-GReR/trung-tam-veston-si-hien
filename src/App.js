@@ -274,7 +274,7 @@ const ImageUploadInput = ({ label, value, onChange }) => {
 };
 
 // ==========================================
-// 🎨 BỘ CÔNG CỤ CẮT & CĂN CHỈNH ẢNH "SIÊU TO KHỔNG LỒ"
+// 🎨 BỘ CÔNG CỤ CẮT & CĂN CHỈNH ẢNH (AVATAR TO RÕ, BẢNG NHỎ GỌN)
 // ==========================================
 const SimpleCropper = ({ imageSrc, onSave, onCancel }) => {
   const [zoom, setZoom] = useState(1);
@@ -282,8 +282,8 @@ const SimpleCropper = ({ imageSrc, onSave, onCancel }) => {
   const [isDragging, setIsDragging] = useState(false);
   const [startPos, setStartPos] = useState({ x: 0, y: 0 });
 
-  // Đã mở rộng kích thước khung cắt lên tối đa 450px để cực kỳ to trên máy tính
-  const CONTAINER_SIZE = 450;
+  // PHÓNG TO VÒNG TRÒN CẮT ẢNH: Đặt kích thước vùng chứa ảnh là 300px (to rõ)
+  const CONTAINER_SIZE = 300;
 
   const onPointerDown = (e) => {
     setIsDragging(true);
@@ -303,6 +303,7 @@ const SimpleCropper = ({ imageSrc, onSave, onCancel }) => {
 
   const applyCrop = () => {
     const canvas = document.createElement("canvas");
+    // GIỮ NGUYÊN ĐỘ PHÂN GIẢI CAO: Ảnh sau khi cắt vẫn là HD 500x500 pixel
     canvas.width = 500;
     canvas.height = 500;
     const ctx = canvas.getContext("2d");
@@ -328,16 +329,16 @@ const SimpleCropper = ({ imageSrc, onSave, onCancel }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 p-2 sm:p-4 animate-fade-in backdrop-blur-sm">
-      {/* Mở rộng max-w thành max-w-2xl để cái bảng chiếm gần hết màn hình máy tính */}
-      <div className="bg-white p-8 rounded-[2.5rem] w-full max-w-2xl flex flex-col items-center shadow-[0_35px_60px_-15px_rgba(0,0,0,0.5)] border-4 border-[#133c3e]">
-        <h3 className="font-black text-3xl mb-10 text-[#133c3e] uppercase tracking-wide border-b-4 border-[#e5c07b] pb-3">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/85 p-4 animate-fade-in backdrop-blur-sm">
+      {/* THU NHỎ BẢNG HỘI THOẠI: Dùng max-w-sm để bảng trắng nhỏ gọn lại như cũ */}
+      <div className="bg-white p-6 rounded-[2rem] w-full max-w-sm flex flex-col items-center shadow-2xl">
+        <h3 className="font-black text-2xl mb-6 text-[#133c3e] uppercase tracking-wide border-b-2 border-[#e5c07b] pb-2">
           Căn Chỉnh Logo
         </h3>
 
-        {/* Vùng kéo thả ảnh SIÊU TO (450x450px) */}
+        {/* VÒNG TRÒN CẮT ẢNH TO: Kích thước 300x300 pixel, chiếm gần hết bảng trắng */}
         <div
-          className="relative w-[450px] h-[450px] overflow-hidden rounded-full border-[6px] border-[#e5c07b] bg-gray-100 cursor-move shadow-[inset_0_0_30px_rgba(0,0,0,0.4)]"
+          className="relative w-[300px] h-[300px] overflow-hidden rounded-full border-4 border-[#e5c07b] bg-gray-100 cursor-move shadow-[inset_0_0_20px_rgba(0,0,0,0.2)]"
           onMouseDown={onPointerDown}
           onMouseMove={onPointerMove}
           onMouseUp={onPointerUp}
@@ -365,9 +366,9 @@ const SimpleCropper = ({ imageSrc, onSave, onCancel }) => {
           <div className="absolute inset-0 pointer-events-none border-[15px] border-white/20 rounded-full"></div>
         </div>
 
-        {/* Thanh Zoom bự, dễ thao tác */}
-        <div className="w-full mt-12 flex items-center gap-5 px-4">
-          <span className="text-3xl opacity-60">🔍</span>
+        {/* Thanh Zoom */}
+        <div className="w-full mt-8 flex items-center gap-4 px-2">
+          <span className="text-2xl opacity-60">🔍</span>
           <input
             type="range"
             min="1"
@@ -375,27 +376,27 @@ const SimpleCropper = ({ imageSrc, onSave, onCancel }) => {
             step="0.05"
             value={zoom}
             onChange={(e) => setZoom(e.target.value)}
-            className="flex-1 h-4 bg-gray-200 rounded-xl appearance-none cursor-pointer accent-[#e5c07b]"
+            className="flex-1 h-3 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[#e5c07b]"
           />
-          <span className="text-4xl">🔍</span>
+          <span className="text-3xl">🔍</span>
         </div>
 
-        <p className="text-base text-gray-500 mt-8 mb-10 font-bold uppercase tracking-wider bg-gray-100 px-6 py-4 rounded-full shadow-inner">
-          👆 Dùng 1 ngón tay kéo hoặc giữ chuột để di chuyển
+        <p className="text-xs text-gray-500 mt-4 mb-8 font-bold uppercase tracking-wider bg-gray-100 px-4 py-2 rounded-full">
+          👆 Dùng 1 ngón tay kéo để di chuyển ảnh
         </p>
 
-        <div className="flex gap-5 w-full mt-2">
+        <div className="flex gap-4 w-full mt-2">
           <button
             onClick={onCancel}
-            className="flex-1 py-5 text-xl bg-gray-100 text-gray-600 font-black rounded-2xl hover:bg-gray-200 transition shadow-sm"
+            className="flex-1 py-4 bg-gray-100 text-gray-600 font-black rounded-2xl hover:bg-gray-200 transition"
           >
             HỦY
           </button>
           <button
             onClick={applyCrop}
-            className="flex-[2] py-5 text-xl bg-[#133c3e] text-[#e5c07b] font-black rounded-2xl hover:bg-[#0f2d2f] border-4 border-[#e5c07b] transition shadow-2xl shadow-[#133c3e]/40 transform hover:scale-[1.03]"
+            className="flex-[2] py-4 bg-[#133c3e] text-[#e5c07b] font-black rounded-2xl hover:bg-[#0f2d2f] border border-[#e5c07b] transition shadow-lg shadow-[#133c3e]/30"
           >
-            LƯU AVATAR MỚI
+            LƯU AVATAR
           </button>
         </div>
       </div>
@@ -1029,7 +1030,7 @@ const AdminDashboard = ({
 
   return (
     <div className="space-y-6">
-      {/* CÔNG CỤ CẮT ẢNH SIÊU TO HIỂN THỊ KHI CHỌN FILE */}
+      {/* CÔNG CỤ CẮT ẢNH HIỂN THỊ KHI CHỌN FILE (VÒNG TRÒN TO, BẢNG NHỎ) */}
       {tempLogo && (
         <SimpleCropper
           imageSrc={tempLogo}
