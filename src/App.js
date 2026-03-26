@@ -273,6 +273,134 @@ const ImageUploadInput = ({ label, value, onChange }) => {
   );
 };
 
+// ==========================================
+// 🎨 BỘ CÔNG CỤ CẮT & CĂN CHỈNH ẢNH (NHƯ FACEBOOK)
+// ==========================================
+const SimpleCropper = ({ imageSrc, onSave, onCancel }) => {
+  const [zoom, setZoom] = useState(1);
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [isDragging, setIsDragging] = useState(false);
+  const [startPos, setStartPos] = useState({ x: 0, y: 0 });
+
+  const onPointerDown = (e) => {
+    setIsDragging(true);
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    setStartPos({ x: clientX - position.x, y: clientY - position.y });
+  };
+
+  const onPointerMove = (e) => {
+    if (!isDragging) return;
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    setPosition({ x: clientX - startPos.x, y: clientY - startPos.y });
+  };
+
+  const onPointerUp = () => setIsDragging(false);
+
+  const applyCrop = () => {
+    const canvas = document.createElement("canvas");
+    canvas.width = 500;
+    canvas.height = 500;
+    const ctx = canvas.getContext("2d");
+    const img = new Image();
+    img.src = imageSrc;
+    img.onload = () => {
+      // Vẽ nền trắng
+      ctx.fillStyle = "#fff";
+      ctx.fillRect(0, 0, 500, 500);
+
+      // Tính toán tỷ lệ dựa trên thao tác người dùng
+      const ratio = 500 / 256;
+      const minDim = Math.min(img.width, img.height);
+      const baseScale = 256 / minDim;
+      const drawScale = baseScale * zoom * ratio;
+
+      const w = img.width * drawScale;
+      const h = img.height * drawScale;
+      const x = 250 - w / 2 + position.x * ratio;
+      const y = 250 - h / 2 + position.y * ratio;
+
+      ctx.drawImage(img, x, y, w, h);
+      onSave(canvas.toDataURL("image/jpeg", 0.9));
+    };
+  };
+
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/85 p-4 animate-fade-in backdrop-blur-sm">
+      <div className="bg-white p-6 rounded-[2rem] w-full max-w-sm flex flex-col items-center shadow-2xl">
+        <h3 className="font-black text-xl mb-6 text-[#133c3e] uppercase tracking-wide border-b-2 border-[#e5c07b] pb-2">
+          Căn Chỉnh Logo
+        </h3>
+
+        {/* Vùng kéo thả ảnh */}
+        <div
+          className="relative w-64 h-64 overflow-hidden rounded-full border-4 border-[#e5c07b] bg-gray-100 cursor-move shadow-[inset_0_0_20px_rgba(0,0,0,0.2)]"
+          onMouseDown={onPointerDown}
+          onMouseMove={onPointerMove}
+          onMouseUp={onPointerUp}
+          onMouseLeave={onPointerUp}
+          onTouchStart={onPointerDown}
+          onTouchMove={onPointerMove}
+          onTouchEnd={onPointerUp}
+        >
+          <img
+            src={imageSrc}
+            alt="Preview"
+            draggable="false"
+            style={{
+              transform: `translate(calc(-50% + ${position.x}px), calc(-50% + ${position.y}px)) scale(${zoom})`,
+              position: "absolute",
+              top: "50%",
+              left: "50%",
+              minWidth: "100%",
+              minHeight: "100%",
+              width: "auto",
+              height: "auto",
+              pointerEvents: "none",
+            }}
+          />
+          <div className="absolute inset-0 pointer-events-none border-[15px] border-white/20 rounded-full"></div>
+        </div>
+
+        {/* Thanh Zoom */}
+        <div className="w-full mt-8 flex items-center gap-4 px-2">
+          <span className="text-2xl opacity-60">🔍</span>
+          <input
+            type="range"
+            min="1"
+            max="3"
+            step="0.05"
+            value={zoom}
+            onChange={(e) => setZoom(e.target.value)}
+            className="flex-1 h-3 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[#e5c07b]"
+          />
+          <span className="text-3xl">🔍</span>
+        </div>
+
+        <p className="text-xs text-gray-500 mt-4 mb-8 font-bold uppercase tracking-wider bg-gray-100 px-4 py-2 rounded-full">
+          👆 Dùng 1 ngón tay kéo để di chuyển ảnh
+        </p>
+
+        <div className="flex gap-4 w-full">
+          <button
+            onClick={onCancel}
+            className="flex-1 py-4 bg-gray-100 text-gray-600 font-black rounded-2xl hover:bg-gray-200 transition"
+          >
+            HỦY
+          </button>
+          <button
+            onClick={applyCrop}
+            className="flex-[2] py-4 bg-[#133c3e] text-[#e5c07b] font-black rounded-2xl hover:bg-[#0f2d2f] border border-[#e5c07b] transition shadow-lg shadow-[#133c3e]/30"
+          >
+            LƯU AVATAR
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 // BẢN HIỂN THỊ ĐƠN HÀNG
 const CustomerCard = ({ customer, ownerId, appId, db, showToast, role }) => {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -852,6 +980,9 @@ const AdminDashboard = ({
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("Tất cả");
 
+  // State cho công cụ Cắt Ảnh
+  const [tempLogo, setTempLogo] = useState(null);
+
   const filteredCustomers = customers.filter((c) => {
     const matchSearch =
       c.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -870,47 +1001,44 @@ const AdminDashboard = ({
     0
   );
 
-  // TÍNH NĂNG ĐỔI LOGO TRỰC TIẾP TRÊN WEB
-  const handleLogoChange = (e) => {
+  const handleFileSelect = (e) => {
     const file = e.target.files[0];
     if (!file) return;
-    showToast("Đang tải Logo lên máy chủ...", "success");
     const reader = new FileReader();
     reader.readAsDataURL(file);
-    reader.onload = (event) => {
-      const img = new Image();
-      img.src = event.target.result;
-      img.onload = async () => {
-        const canvas = document.createElement("canvas");
-        // Tự động căn giữa và cắt thành hình vuông chuẩn (500x500px)
-        const size = Math.min(img.width, img.height);
-        canvas.width = 500;
-        canvas.height = 500;
-        const ctx = canvas.getContext("2d");
-        const sx = (img.width - size) / 2;
-        const sy = (img.height - size) / 2;
-        ctx.drawImage(img, sx, sy, size, size, 0, 0, 500, 500);
-        const base64 = canvas.toDataURL("image/jpeg", 0.9);
+    reader.onload = (event) => setTempLogo(event.target.result);
+    e.target.value = null; // Reset
+  };
 
-        try {
-          await setDoc(
-            doc(db, "public_settings", appId),
-            { logo: base64 },
-            { merge: true }
-          );
-          showToast("Cập nhật Logo thành công rực rỡ!", "success");
-        } catch (err) {
-          showToast("Lỗi lưu logo: " + err.message, "error");
-        }
-      };
-    };
+  const saveLogoToFirebase = async (croppedBase64) => {
+    setTempLogo(null);
+    showToast("Đang đẩy Logo lên máy chủ...", "success");
+    try {
+      await setDoc(
+        doc(db, "public_settings", appId),
+        { logo: croppedBase64 },
+        { merge: true }
+      );
+      showToast("Đổi Avatar Logo thành công rực rỡ!", "success");
+    } catch (err) {
+      showToast("Lỗi lưu logo: " + err.message, "error");
+    }
   };
 
   return (
     <div className="space-y-6">
+      {/* Nếu đang chọn ảnh, hiển thị Bảng Cắt Ảnh (Cropper) */}
+      {tempLogo && (
+        <SimpleCropper
+          imageSrc={tempLogo}
+          onSave={saveLogoToFirebase}
+          onCancel={() => setTempLogo(null)}
+        />
+      )}
+
       <header className="flex flex-col sm:flex-row justify-between items-center bg-[#133c3e] p-6 rounded-2xl shadow-xl border-b-4 border-[#e5c07b]">
         <div className="flex items-center gap-4">
-          {/* NÚT BẤM ĐỂ THAY ĐỔI LOGO */}
+          {/* NÚT BẤM ĐỂ MỞ THƯ VIỆN CHỌN LOGO */}
           <label
             className="cursor-pointer relative group block w-16 h-16 rounded-full border-2 border-[#e5c07b] shadow-md bg-white overflow-hidden flex-shrink-0"
             title="Bấm vào để đổi Logo"
@@ -919,15 +1047,15 @@ const AdminDashboard = ({
               type="file"
               accept="image/*"
               className="hidden"
-              onChange={handleLogoChange}
+              onChange={handleFileSelect}
             />
             <img
               src={shopLogo}
               alt="Logo Tiệm"
               className="w-full h-full object-cover group-hover:opacity-40 transition duration-300"
             />
-            <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 bg-black/40 transition duration-300">
-              <span className="text-white text-[10px] font-black tracking-wider text-center">
+            <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 bg-black/50 transition duration-300">
+              <span className="text-white text-[10px] font-black tracking-wider text-center leading-tight">
                 ĐỔI
                 <br />
                 LOGO
@@ -1392,7 +1520,7 @@ const CustomerLookup = ({ ownerId, showToast, shopLogo }) => {
           <img
             src={shopLogo}
             alt="Logo"
-            className="w-20 h-20 rounded-full border-4 border-green-200 shadow-md object-cover"
+            className="w-24 h-24 rounded-full border-4 border-green-200 shadow-md object-cover bg-white"
           />
         </div>
         <h1 className="text-3xl font-black text-green-700 text-center mb-2 uppercase">
@@ -1468,7 +1596,7 @@ const LoginScreen = ({ setAppRole, OWNER_ID, showToast, shopLogo }) => {
   };
   return (
     <div className="max-w-md w-full mx-auto mt-16 p-6 sm:p-10 bg-white shadow-2xl rounded-[2rem] border border-gray-200">
-      {/* LOGO HIỂN THỊ TRỰC TIẾP TỪ FIREBASE */}
+      {/* LOGO ĐĂNG NHẬP */}
       <div className="text-center mb-10">
         <img
           src={shopLogo}
@@ -1578,7 +1706,7 @@ export default function App() {
   const [isGeneratingProfile, setIsGeneratingProfile] = useState(false);
   const [generatedProfile, setGeneratedProfile] = useState(null);
 
-  // STATE LƯU TRỮ LOGO
+  // STATE LƯU TRỮ LOGO VÀ LẤY TỪ MÁY CHỦ
   const [shopLogo, setShopLogo] = useState(
     "https://i.postimg.cc/JhTTtmTt/LOGO.jpg"
   );
@@ -1595,7 +1723,7 @@ export default function App() {
         db = getFirestore(app);
         auth = getAuth(app);
 
-        // Lắng nghe và tải Logo từ máy chủ (Cập nhật mọi nơi ngay lập tức)
+        // Lắng nghe logo cập nhật từ Firebase
         onSnapshot(doc(db, "public_settings", appId), (docSnap) => {
           if (docSnap.exists() && docSnap.data().logo) {
             setShopLogo(docSnap.data().logo);
