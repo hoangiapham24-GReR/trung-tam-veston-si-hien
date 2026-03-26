@@ -399,7 +399,7 @@ const SimpleCropper = ({ imageSrc, onSave, onCancel }) => {
 };
 
 // ==========================================
-// 💌 BẢNG CHỌN GỬI TIN NHẮN (ZALO / SMS / EMAIL)
+// 💌 BẢNG CHỌN GỬI TIN NHẮN (ZALO / SMS / EMAIL GMAIL WEB)
 // ==========================================
 const NotificationModal = ({ customer, onClose, showToast }) => {
   const [msgType, setMsgType] = useState("done"); // 'done' hoặc 'delay'
@@ -451,15 +451,19 @@ const NotificationModal = ({ customer, onClose, showToast }) => {
 
   const handleSendEmail = () => {
     if (!customer.email) {
-        showToast("Khách hàng này chưa lưu Email!", "error");
-        return;
+      showToast("Khách hàng này chưa lưu Email!", "error");
+      return;
     }
-    const subject = msgType === 'done' ? `[Veston Sĩ Hiền] Thông báo hoàn thiện đơn hàng ${customer.orderName}` : `[Veston Sĩ Hiền] Cập nhật tiến độ đơn hàng ${customer.orderName}`;
-    
+    const subject =
+      msgType === "done"
+        ? `[Veston Sĩ Hiền] Thông báo hoàn thiện đơn hàng ${customer.orderName}`
+        : `[Veston Sĩ Hiền] Cập nhật tiến độ đơn hàng ${customer.orderName}`;
+
     // TUYỆT CHIÊU: Ép mở tab mới vào thẳng trang web Gmail, điền sẵn thông tin!
-    const gmailWebUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${customer.email}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(message)}`;
-    window.open(gmailWebUrl, '_blank');
-};
+    const gmailWebUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${
+      customer.email
+    }&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(message)}`;
+    window.open(gmailWebUrl, "_blank");
   };
 
   return (
@@ -529,7 +533,7 @@ const NotificationModal = ({ customer, onClose, showToast }) => {
               onClick={handleSendEmail}
               className="flex-1 py-3 bg-gray-50 text-gray-700 border border-gray-200 hover:bg-gray-100 font-bold rounded-xl shadow-sm transition flex justify-center items-center gap-2"
             >
-              ✉️ Gửi Email
+              ✉️ Gửi Email Web
             </button>
           </div>
         </div>
