@@ -274,7 +274,7 @@ const ImageUploadInput = ({ label, value, onChange }) => {
 };
 
 // ==========================================
-// 🎨 BỘ CÔNG CỤ CẮT & CĂN CHỈNH ẢNH
+// 🎨 BỘ CÔNG CỤ CẮT & CĂN CHỈNH ẢNH (BẢO TOÀN CHI TIẾT)
 // ==========================================
 const SimpleCropper = ({ imageSrc, onSave, onCancel }) => {
   const [zoom, setZoom] = useState(1);
@@ -402,7 +402,7 @@ const SimpleCropper = ({ imageSrc, onSave, onCancel }) => {
 // 💌 BẢNG CHỌN GỬI TIN NHẮN (ZALO / SMS / EMAIL THÔNG MINH)
 // ==========================================
 const NotificationModal = ({ customer, onClose, showToast }) => {
-  const [msgType, setMsgType] = useState("done"); // 'done' hoặc 'delay'
+  const [msgType, setMsgType] = useState("done");
   const [message, setMessage] = useState("");
 
   useEffect(() => {
@@ -455,22 +455,17 @@ const NotificationModal = ({ customer, onClose, showToast }) => {
       msgType === "done"
         ? `[Trung tâm Veston Sĩ Hiền] Thông báo hoàn thiện đơn hàng ${customer.orderName}`
         : `[Trung tâm Veston Sĩ Hiền] Cập nhật tiến độ đơn hàng ${customer.orderName}`;
-
-    // MẮT THẦN: Kiểm tra xem đang xài Điện thoại hay Máy tính
     const isMobile =
       /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
         navigator.userAgent
       );
-
     if (isMobile) {
-      // Mở app Mail mặc định trên Điện thoại
       window.location.href = `mailto:${
         customer.email
       }?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(
         message
       )}`;
     } else {
-      // Mở tab Gmail trên Máy tính bàn / Laptop
       const gmailWebUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${
         customer.email
       }&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(message)}`;
@@ -558,7 +553,7 @@ const NotificationModal = ({ customer, onClose, showToast }) => {
 const CustomerCard = ({ customer, ownerId, appId, db, showToast, role }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-  const [isNotifying, setIsNotifying] = useState(false); // Trạng thái mở bảng nhắn tin
+  const [isNotifying, setIsNotifying] = useState(false);
   const [editedCustomer, setEditedCustomer] = useState({ ...customer });
   const [isSaving, setIsSaving] = useState(false);
   const isAdmin = role === "admin";
@@ -657,7 +652,6 @@ const CustomerCard = ({ customer, ownerId, appId, db, showToast, role }) => {
 
   return (
     <div className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow duration-300 border border-gray-200 overflow-hidden mb-4 relative">
-      {/* Modal Nhắn Tin */}
       {isNotifying && (
         <NotificationModal
           customer={customer}
@@ -725,7 +719,6 @@ const CustomerCard = ({ customer, ownerId, appId, db, showToast, role }) => {
         <div className="p-5 bg-gray-50/50">
           {isAdmin && (
             <div className="flex flex-wrap justify-end gap-2 mb-5">
-              {/* NÚT BÁO KHÁCH */}
               <button
                 onClick={(e) => {
                   e.stopPropagation();
@@ -1150,11 +1143,11 @@ const AdminDashboard = ({
   isGeneratingProfile,
   generatedProfile,
   shopLogo,
+  onLogout,
 }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("Tất cả");
 
-  // State cho công cụ Cắt Ảnh
   const [tempLogo, setTempLogo] = useState(null);
 
   const filteredCustomers = customers.filter((c) => {
@@ -1181,7 +1174,7 @@ const AdminDashboard = ({
     const reader = new FileReader();
     reader.readAsDataURL(file);
     reader.onload = (event) => setTempLogo(event.target.result);
-    e.target.value = null; // Reset
+    e.target.value = null;
   };
 
   const saveLogoToFirebase = async (croppedBase64) => {
@@ -1201,7 +1194,6 @@ const AdminDashboard = ({
 
   return (
     <div className="space-y-6">
-      {/* CÔNG CỤ CẮT ẢNH HIỂN THỊ KHI CHỌN FILE */}
       {tempLogo && (
         <SimpleCropper
           imageSrc={tempLogo}
@@ -1211,8 +1203,7 @@ const AdminDashboard = ({
       )}
 
       <header className="flex flex-col sm:flex-row justify-between items-center bg-[#133c3e] p-6 rounded-2xl shadow-xl border-b-4 border-[#e5c07b]">
-        <div className="flex items-center gap-4">
-          {/* NÚT BẤM ĐỂ MỞ THƯ VIỆN CHỌN LOGO */}
+        <div className="flex items-center gap-4 w-full sm:w-auto mb-4 sm:mb-0">
           <label
             className="cursor-pointer relative group block w-16 h-16 rounded-full border-2 border-[#e5c07b] shadow-md bg-white overflow-hidden flex-shrink-0"
             title="Bấm vào để đổi Logo"
@@ -1237,23 +1228,31 @@ const AdminDashboard = ({
             </div>
           </label>
 
-          <div>
+          <div className="flex-1">
             <h1 className="text-2xl font-black text-[#e5c07b] tracking-wide uppercase">
               Trung Tâm Veston Sĩ Hiền
             </h1>
-            <p className="text-sm text-gray-300">Hệ Thống Quản Lý Nội Bộ</p>
+            <p className="text-sm text-gray-300 flex justify-between items-center pr-2">
+              <span>Hệ Thống Quản Lý Nội Bộ</span>
+              <button
+                onClick={onLogout}
+                className="text-xs bg-red-500/20 text-red-200 hover:bg-red-500 hover:text-white px-3 py-1 rounded-lg transition border border-red-500/30"
+              >
+                Thoát
+              </button>
+            </p>
           </div>
         </div>
-        <div className="mt-4 sm:mt-0 flex gap-2">
+        <div className="flex gap-2 w-full sm:w-auto">
           <button
             onClick={() => exportToCSV(filteredCustomers)}
-            className="px-4 py-2 text-sm font-bold rounded-lg bg-white/10 text-white hover:bg-white/20 transition shadow-sm border border-white/20"
+            className="flex-1 sm:flex-none px-4 py-2 text-sm font-bold rounded-lg bg-white/10 text-white hover:bg-white/20 transition shadow-sm border border-white/20"
           >
             📊 Tải Excel
           </button>
           <button
             onClick={() => setIsAdding(!isAdding)}
-            className={`px-5 py-2 text-sm font-bold rounded-lg transition border shadow-lg ${
+            className={`flex-1 sm:flex-none px-5 py-2 text-sm font-bold rounded-lg transition border shadow-lg ${
               isAdding
                 ? "bg-gray-200 text-gray-800"
                 : "bg-[#e5c07b] text-[#133c3e] hover:bg-yellow-500 border-[#e5c07b]"
@@ -1654,7 +1653,7 @@ const AdminDashboard = ({
 // ==========================================
 // MÀN HÌNH KHÁCH HÀNG TRA CỨU
 // ==========================================
-const CustomerLookup = ({ ownerId, showToast, shopLogo }) => {
+const CustomerLookup = ({ ownerId, showToast, shopLogo, onBack }) => {
   const [lookupInfo, setLookupInfo] = useState({ phone: "", orderName: "" });
   const [orderResult, setOrderResult] = useState(null);
   const [lookupLoading, setLookupLoading] = useState(false);
@@ -1688,17 +1687,23 @@ const CustomerLookup = ({ ownerId, showToast, shopLogo }) => {
   };
 
   return (
-    <div className="max-w-md mx-auto mt-10">
-      <div className="bg-white shadow-2xl shadow-green-100 rounded-3xl p-8 border border-green-200">
+    <div className="max-w-md mx-auto mt-10 relative">
+      <button
+        onClick={onBack}
+        className="absolute -top-10 left-0 text-sm font-bold text-gray-500 hover:text-[#133c3e] transition flex items-center gap-1"
+      >
+        ⬅ Về Trang Chủ
+      </button>
+      <div className="bg-white shadow-2xl shadow-[#e5c07b]/20 rounded-3xl p-8 border border-[#e5c07b]/30">
         <div className="flex justify-center mb-6">
           <img
             src={shopLogo}
             alt="Logo"
-            className="w-24 h-24 rounded-full border-4 border-green-200 shadow-md object-cover bg-white"
+            className="w-24 h-24 rounded-full border-4 border-[#e5c07b] shadow-md object-cover bg-white"
           />
         </div>
-        <h1 className="text-3xl font-black text-green-700 text-center mb-2 uppercase">
-          TRA CỨU ĐƠN KHÁCH HÀNG
+        <h1 className="text-3xl font-black text-[#133c3e] text-center mb-2 uppercase">
+          TRA CỨU ĐƠN HÀNG
         </h1>
         <p className="text-center text-gray-500 text-sm mb-8 font-medium">
           Nhập đúng thông tin để xem tiến độ may đồ của bạn
@@ -1714,7 +1719,7 @@ const CustomerLookup = ({ ownerId, showToast, shopLogo }) => {
               onChange={(e) =>
                 setLookupInfo({ ...lookupInfo, phone: e.target.value })
               }
-              className="mt-1 w-full p-4 bg-gray-50 border border-gray-300 rounded-xl focus:border-green-500 focus:bg-white outline-none transition font-bold text-lg"
+              className="mt-1 w-full p-4 bg-gray-50 border border-gray-300 rounded-xl focus:border-[#e5c07b] focus:bg-white outline-none transition font-bold text-lg"
             />
           </div>
           <div>
@@ -1727,14 +1732,14 @@ const CustomerLookup = ({ ownerId, showToast, shopLogo }) => {
               onChange={(e) =>
                 setLookupInfo({ ...lookupInfo, orderName: e.target.value })
               }
-              className="mt-1 w-full p-4 bg-gray-50 border border-gray-300 rounded-xl focus:border-green-500 focus:bg-white outline-none transition font-mono font-bold text-lg"
+              className="mt-1 w-full p-4 bg-gray-50 border border-gray-300 rounded-xl focus:border-[#e5c07b] focus:bg-white outline-none transition font-mono font-bold text-lg"
               placeholder="VD: NGUYENVANA_123"
             />
           </div>
           <button
             type="submit"
             disabled={lookupLoading}
-            className="w-full py-4 font-black text-lg rounded-xl text-white bg-green-600 hover:bg-green-700 shadow-xl shadow-green-200 transition transform hover:-translate-y-1 mt-4"
+            className="w-full py-4 font-black text-lg rounded-xl text-[#133c3e] bg-[#e5c07b] hover:bg-yellow-500 shadow-xl shadow-[#e5c07b]/30 transition transform hover:-translate-y-1 mt-4"
           >
             {lookupLoading ? "ĐANG TÌM..." : "KIỂM TRA TIẾN ĐỘ NGAY"}
           </button>
@@ -1757,85 +1762,172 @@ const CustomerLookup = ({ ownerId, showToast, shopLogo }) => {
 };
 
 // ==========================================
-// MÀN HÌNH ĐĂNG NHẬP CHÍNH THỨC
+// MÀN HÌNH ĐĂNG NHẬP DÀNH CHO ADMIN
 // ==========================================
-const LoginScreen = ({ setAppRole, OWNER_ID, showToast, shopLogo }) => {
+const LoginScreen = ({ setAppView, OWNER_ID, showToast, shopLogo }) => {
   const [pin, setPin] = useState("");
   const handleAdminLogin = (e) => {
     e.preventDefault();
     if (pin === ADMIN_PASSCODE && OWNER_ID) {
-      setAppRole("admin");
+      setAppView("admin");
       localStorage.setItem("appRole", "admin");
     } else showToast("Sai Mã PIN bảo mật!", "error");
   };
   return (
-    <div className="max-w-md w-full mx-auto mt-16 p-6 sm:p-10 bg-white shadow-2xl rounded-[2rem] border border-gray-200">
-      {/* LOGO ĐĂNG NHẬP */}
-      <div className="text-center mb-10">
+    <div className="max-w-sm w-full mx-auto mt-20 p-8 bg-white shadow-2xl rounded-[2rem] border border-gray-200 relative">
+      <button
+        onClick={() => setAppView("landing")}
+        className="absolute top-4 left-4 text-xs font-bold text-gray-400 hover:text-gray-800 transition"
+      >
+        ✕ Đóng
+      </button>
+      <div className="text-center mb-8 mt-4">
         <img
           src={shopLogo}
           alt="Logo Trung tâm Veston Sĩ Hiền"
-          className="w-32 h-32 mx-auto mb-6 rounded-full shadow-2xl border-4 border-[#e5c07b] object-cover bg-white"
+          className="w-24 h-24 mx-auto mb-4 rounded-full shadow-lg border-2 border-[#e5c07b] object-cover bg-white"
         />
-        <h1 className="text-3xl font-black text-[#133c3e] tracking-tight uppercase">
-          Trung Tâm Veston
+        <h1 className="text-xl font-black text-[#133c3e] uppercase">
+          KHU VỰC QUẢN LÝ
         </h1>
-        <h1 className="text-4xl font-black text-[#e5c07b] mt-1 drop-shadow-sm uppercase">
-          SĨ HIỀN
-        </h1>
-        <p className="text-gray-500 font-bold mt-2 text-sm tracking-widest">
-          EST. 2004
+        <p className="text-gray-500 font-bold mt-1 text-xs tracking-widest">
+          CHỈ DÀNH CHO NHÂN VIÊN
         </p>
       </div>
+      <form onSubmit={handleAdminLogin} className="flex flex-col gap-4">
+        <input
+          type="password"
+          placeholder="Nhập PIN"
+          value={pin}
+          onChange={(e) => setPin(e.target.value)}
+          className="w-full p-4 bg-gray-50 border-2 border-gray-200 text-[#133c3e] rounded-xl text-center tracking-[0.5em] font-black text-xl outline-none focus:border-[#e5c07b] transition"
+          maxLength={4}
+        />
+        <button
+          type="submit"
+          className="w-full py-4 font-black text-lg rounded-xl bg-[#133c3e] text-[#e5c07b] hover:bg-[#0f2d2f] transition shadow-lg uppercase"
+        >
+          ĐĂNG NHẬP
+        </button>
+      </form>
+    </div>
+  );
+};
 
-      <div className="space-y-8">
-        <div className="p-1 rounded-2xl bg-gradient-to-r from-green-400 to-emerald-500 p-[2px]">
-          <div className="bg-white rounded-2xl p-4">
-            <h3 className="font-black text-green-700 mb-2 text-center text-sm uppercase">
-              🚪 DÀNH CHO KHÁCH HÀNG
-            </h3>
-            <p className="text-xs text-center text-gray-500 mb-4">
-              Xem tiến độ may trang phục của bạn
-            </p>
-            <button
-              onClick={() => setAppRole("guest")}
-              className="w-full py-4 font-black text-lg rounded-xl bg-green-50 text-green-700 border-2 border-green-200 hover:bg-green-100 hover:border-green-300 transition shadow-sm"
-            >
-              TRA CỨU ĐƠN HÀNG
-            </button>
-          </div>
-        </div>
-
-        <div className="relative flex py-2 items-center">
-          <div className="flex-grow border-t border-gray-300"></div>
-          <span className="flex-shrink-0 mx-4 text-gray-400 text-xs font-black uppercase tracking-widest">
-            Khu Vực Nội Bộ
+// ==========================================
+// 🌟 MẶT TIỀN - TRANG CHỦ (LANDING PAGE) 🌟
+// ==========================================
+const LandingPage = ({ setAppView, shopLogo }) => {
+  return (
+    <div className="bg-white min-h-screen font-sans">
+      {/* Thanh Điều Hướng */}
+      <nav className="bg-[#133c3e] px-4 py-3 sm:px-8 sm:py-4 flex justify-between items-center shadow-lg sticky top-0 z-50">
+        <div className="flex items-center gap-3">
+          <img
+            src={shopLogo}
+            alt="Logo"
+            className="w-10 h-10 sm:w-12 sm:h-12 rounded-full border-2 border-[#e5c07b] bg-white object-cover"
+          />
+          <span className="text-[#e5c07b] font-black text-lg sm:text-2xl tracking-wider uppercase">
+            Sĩ Hiền
           </span>
-          <div className="flex-grow border-t border-gray-300"></div>
         </div>
+        <div>
+          <button
+            onClick={() => setAppView("lookup")}
+            className="text-sm sm:text-base text-[#133c3e] font-black bg-[#e5c07b] px-4 py-2 sm:px-6 sm:py-2.5 rounded-full hover:bg-yellow-500 transition shadow-md uppercase"
+          >
+            Tra Cứu Đơn
+          </button>
+        </div>
+      </nav>
 
-        <div className="p-5 rounded-2xl bg-[#133c3e] border-2 border-[#e5c07b] shadow-xl relative overflow-hidden">
-          <h3 className="font-black text-[#e5c07b] mb-4 text-center text-sm uppercase tracking-wider">
-            🔒 ĐĂNG NHẬP QUẢN LÝ TRUNG TÂM
+      {/* Banner Chính */}
+      <div className="bg-[#133c3e] text-center py-20 px-4 relative overflow-hidden">
+        <img
+          src={shopLogo}
+          alt="Logo To"
+          className="w-32 h-32 sm:w-48 sm:h-48 mx-auto rounded-full border-4 border-[#e5c07b] shadow-[0_0_40px_rgba(229,192,123,0.3)] mb-8 relative z-10 object-cover bg-white"
+        />
+        <h1 className="text-3xl sm:text-5xl md:text-6xl font-black text-[#e5c07b] mb-2 relative z-10 uppercase tracking-widest drop-shadow-lg">
+          Trung Tâm Veston
+        </h1>
+        <h2 className="text-4xl sm:text-6xl md:text-7xl font-black text-white mb-8 relative z-10 uppercase tracking-[0.2em] drop-shadow-xl">
+          SĨ HIỀN
+        </h2>
+        <p className="text-gray-300 text-base sm:text-xl max-w-2xl mx-auto mb-12 relative z-10 font-medium leading-relaxed px-4">
+          Kinh nghiệm hơn 20 năm trong ngành may đo Veston cao cấp. Chúng tôi tự
+          hào mang đến sự hoàn hảo, chuẩn mực và đẳng cấp cho từng quý ông Việt.
+        </p>
+        <button
+          onClick={() => setAppView("lookup")}
+          className="bg-[#e5c07b] text-[#133c3e] px-8 py-4 sm:px-10 sm:py-5 rounded-full font-black text-lg sm:text-xl shadow-2xl shadow-[#e5c07b]/20 hover:scale-105 transition transform relative z-10 uppercase tracking-wider border-2 border-[#e5c07b]"
+        >
+          ✂️ Kiểm Tra Tiến Độ May
+        </button>
+        {/* Lưới background trang trí */}
+        <div
+          className="absolute inset-0 opacity-5"
+          style={{
+            backgroundImage:
+              "linear-gradient(#e5c07b 1px, transparent 1px), linear-gradient(90deg, #e5c07b 1px, transparent 1px)",
+            backgroundSize: "40px 40px",
+          }}
+        ></div>
+      </div>
+
+      {/* Ba cột Dịch vụ */}
+      <div className="py-20 px-4 max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="text-center p-8 bg-gray-50 rounded-3xl shadow-sm border border-gray-100 hover:shadow-xl transition transform hover:-translate-y-2">
+          <div className="text-6xl mb-6 drop-shadow-md">📐</div>
+          <h3 className="text-xl font-black text-[#133c3e] mb-4 uppercase tracking-wide">
+            Cắt May Bespoke
           </h3>
-          <form onSubmit={handleAdminLogin} className="flex flex-col gap-3">
-            <input
-              type="password"
-              placeholder="Nhập mã PIN bảo mật"
-              value={pin}
-              onChange={(e) => setPin(e.target.value)}
-              className="w-full p-4 bg-white/10 border-2 border-[#e5c07b]/50 text-white rounded-xl text-center tracking-[0.5em] font-bold outline-none focus:border-[#e5c07b] focus:bg-white/20 placeholder-gray-400 transition"
-              maxLength={4}
-            />
-            <button
-              type="submit"
-              className="w-full py-4 font-black text-lg rounded-xl bg-[#e5c07b] text-[#133c3e] hover:bg-yellow-500 transition shadow-lg mt-2 uppercase"
-            >
-              VÀO LÀM VIỆC
-            </button>
-          </form>
+          <p className="text-gray-600 font-medium leading-relaxed">
+            Đo ni đóng giày chuẩn xác đến từng milimet. Tôn vinh trọn vẹn vóc
+            dáng người mặc với kỹ thuật rập độc quyền.
+          </p>
+        </div>
+        <div className="text-center p-8 bg-gray-50 rounded-3xl shadow-sm border border-gray-100 hover:shadow-xl transition transform hover:-translate-y-2">
+          <div className="text-6xl mb-6 drop-shadow-md">🧵</div>
+          <h3 className="text-xl font-black text-[#133c3e] mb-4 uppercase tracking-wide">
+            Vải Ngoại Nhập
+          </h3>
+          <p className="text-gray-600 font-medium leading-relaxed">
+            Bộ sưu tập vải len, lụa, linen cao cấp được tuyển chọn khắt khe từ
+            các xưởng dệt lừng danh tại Ý và Anh Quốc.
+          </p>
+        </div>
+        <div className="text-center p-8 bg-gray-50 rounded-3xl shadow-sm border border-gray-100 hover:shadow-xl transition transform hover:-translate-y-2">
+          <div className="text-6xl mb-6 drop-shadow-md">👑</div>
+          <h3 className="text-xl font-black text-[#133c3e] mb-4 uppercase tracking-wide">
+            Bảo Hành Dài Hạn
+          </h3>
+          <p className="text-gray-600 font-medium leading-relaxed">
+            Cam kết đồng hành cùng trang phục của bạn. Hỗ trợ chỉnh sửa vừa vặn
+            theo sự thay đổi form dáng hoàn toàn miễn phí.
+          </p>
         </div>
       </div>
+
+      {/* Chân trang - Footer */}
+      <footer className="bg-[#0a1f20] text-center py-10 px-4 relative">
+        <h2 className="text-2xl font-black text-[#e5c07b] mb-2 uppercase tracking-widest">
+          Trung Tâm Veston Sĩ Hiền
+        </h2>
+        <p className="text-gray-400 text-sm mb-8 font-medium">
+          Khẳng định đẳng cấp quý ông từ năm 2004
+        </p>
+        <div className="flex justify-center border-t border-gray-800 pt-8 mt-8">
+          {/* NÚT QUẢN LÝ BÍ MẬT */}
+          <button
+            onClick={() => setAppView("login")}
+            className="text-gray-600 hover:text-[#e5c07b] transition flex items-center gap-2 text-xs font-bold uppercase tracking-wider px-4 py-2 rounded-lg hover:bg-white/5"
+          >
+            <span className="text-base">🔒</span> Quản trị viên
+          </button>
+        </div>
+      </footer>
     </div>
   );
 };
@@ -1875,12 +1967,13 @@ export default function App() {
   });
   const [isAdding, setIsAdding] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [appRole, setAppRole] = useState(null);
+
+  // STATE ĐIỀU HƯỚNG MÀN HÌNH: 'landing', 'login', 'lookup', 'admin'
+  const [appView, setAppView] = useState("loading");
+
   const [toast, setToast] = useState(null);
   const [isGeneratingProfile, setIsGeneratingProfile] = useState(false);
   const [generatedProfile, setGeneratedProfile] = useState(null);
-
-  // STATE LƯU TRỮ LOGO VÀ LẤY TỪ MÁY CHỦ
   const [shopLogo, setShopLogo] = useState(
     "https://i.postimg.cc/JhTTtmTt/LOGO.jpg"
   );
@@ -1897,7 +1990,6 @@ export default function App() {
         db = getFirestore(app);
         auth = getAuth(app);
 
-        // Lắng nghe logo cập nhật từ Firebase
         onSnapshot(doc(db, "public_settings", appId), (docSnap) => {
           if (docSnap.exists() && docSnap.data().logo) {
             setShopLogo(docSnap.data().logo);
@@ -1907,8 +1999,11 @@ export default function App() {
         const unsubscribe = onAuthStateChanged(auth, async (user) => {
           if (user) {
             OWNER_ID = user.uid;
-            if (localStorage.getItem("appRole") === "admin")
-              setAppRole("admin");
+            if (localStorage.getItem("appRole") === "admin") {
+              setAppView("admin");
+            } else {
+              setAppView("landing"); // Mặc định mở Trang Chủ
+            }
             setIsLoading(false);
           } else await signInAnonymously(auth);
         });
@@ -1922,7 +2017,7 @@ export default function App() {
   }, [showToast]);
 
   useEffect(() => {
-    if (appRole !== "admin" || !OWNER_ID || !db) return;
+    if (appView !== "admin" || !OWNER_ID || !db) return;
     const q = collection(
       db,
       `artifacts/${appId}/users/${OWNER_ID}/customer_measurements`
@@ -1934,7 +2029,7 @@ export default function App() {
       setCustomers(list);
     });
     return () => unsubscribe();
-  }, [appRole]);
+  }, [appView]);
 
   const generateFitProfile = async () => {
     const measurements = {
@@ -2111,26 +2206,16 @@ export default function App() {
     setIsLoading(false);
   };
 
-  if (isLoading && OWNER_ID === null)
+  // QUẢN LÝ MÀN HÌNH HIỂN THỊ TẠI ĐÂY
+  if (isLoading || appView === "loading")
     return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-        <div className="w-10 h-10 border-4 border-[#133c3e] border-t-[#e5c07b] rounded-full animate-spin"></div>
-      </div>
-    );
-  if (appRole === null)
-    return (
-      <div className="min-h-screen bg-gray-50 flex flex-col justify-center pb-10">
-        <LoginScreen
-          setAppRole={setAppRole}
-          OWNER_ID={OWNER_ID}
-          showToast={showToast}
-          shopLogo={shopLogo}
-        />
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="w-12 h-12 border-4 border-[#133c3e] border-t-[#e5c07b] rounded-full animate-spin"></div>
       </div>
     );
 
   return (
-    <div className="min-h-screen bg-gray-50 font-sans pb-10 text-gray-800 relative overflow-hidden">
+    <div className="min-h-screen bg-gray-50 font-sans text-gray-800 relative overflow-hidden">
       {toast && (
         <div
           className={`fixed top-5 left-1/2 transform -translate-x-1/2 px-6 py-3 rounded-full shadow-2xl text-white font-bold text-sm z-50 transition-all ${
@@ -2141,51 +2226,58 @@ export default function App() {
         </div>
       )}
 
-      <div className="bg-[#0a1f20] px-4 py-3 flex justify-between items-center shadow-md">
-        <div className="text-[#e5c07b] font-bold text-sm flex items-center gap-2">
-          <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>{" "}
-          {appRole === "admin"
-            ? "Quyền Quản Lý (Admin)"
-            : "Chế Độ Khách Hàng (Chỉ Xem)"}
-        </div>
-        <button
-          onClick={() => {
-            setAppRole(null);
-            setCustomers([]);
-            localStorage.removeItem("appRole");
-          }}
-          className="text-xs text-gray-300 hover:text-white bg-white/10 px-4 py-2 rounded-lg transition border border-white/20 font-bold"
-        >
-          Thoát
-        </button>
-      </div>
+      {appView === "landing" && (
+        <LandingPage setAppView={setAppView} shopLogo={shopLogo} />
+      )}
 
-      <div className="max-w-6xl mx-auto mt-6 px-4">
-        {appRole === "admin" ? (
-          <AdminDashboard
-            userId={OWNER_ID}
-            customers={customers}
+      {appView === "login" && (
+        <div className="min-h-screen bg-gray-50 flex flex-col justify-center pb-10">
+          <LoginScreen
+            setAppView={setAppView}
+            OWNER_ID={OWNER_ID}
             showToast={showToast}
-            isLoading={isLoading}
-            handleAddCustomer={handleAddCustomer}
-            handleInputChange={handleInputChange}
-            newCustomer={newCustomer}
-            setNewCustomer={setNewCustomer}
-            setIsAdding={setIsAdding}
-            isAdding={isAdding}
-            generateFitProfile={generateFitProfile}
-            isGeneratingProfile={isGeneratingProfile}
-            generatedProfile={generatedProfile}
             shopLogo={shopLogo}
           />
-        ) : (
+        </div>
+      )}
+
+      {appView === "lookup" && (
+        <div className="min-h-screen bg-gray-50 py-10">
           <CustomerLookup
             ownerId={OWNER_ID}
             showToast={showToast}
             shopLogo={shopLogo}
+            onBack={() => setAppView("landing")}
           />
-        )}
-      </div>
+        </div>
+      )}
+
+      {appView === "admin" && (
+        <div className="pb-10">
+          <div className="max-w-6xl mx-auto mt-6 px-4">
+            <AdminDashboard
+              userId={OWNER_ID}
+              customers={customers}
+              showToast={showToast}
+              isLoading={isLoading}
+              handleAddCustomer={handleAddCustomer}
+              handleInputChange={handleInputChange}
+              newCustomer={newCustomer}
+              setNewCustomer={setNewCustomer}
+              setIsAdding={setIsAdding}
+              isAdding={isAdding}
+              generateFitProfile={generateFitProfile}
+              isGeneratingProfile={isGeneratingProfile}
+              generatedProfile={generatedProfile}
+              shopLogo={shopLogo}
+              onLogout={() => {
+                setAppView("landing");
+                localStorage.removeItem("appRole");
+              }}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
