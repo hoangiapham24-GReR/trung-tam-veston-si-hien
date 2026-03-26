@@ -274,7 +274,7 @@ const ImageUploadInput = ({ label, value, onChange }) => {
 };
 
 // ==========================================
-// 🎨 BỘ CÔNG CỤ CẮT & CĂN CHỈNH ẢNH (AVATAR TO RÕ, BẢNG NHỎ GỌN)
+// 🎨 BỘ CÔNG CỤ CẮT & CĂN CHỈNH ẢNH (BẢO TOÀN CHI TIẾT)
 // ==========================================
 const SimpleCropper = ({ imageSrc, onSave, onCancel }) => {
   const [zoom, setZoom] = useState(1);
@@ -282,7 +282,6 @@ const SimpleCropper = ({ imageSrc, onSave, onCancel }) => {
   const [isDragging, setIsDragging] = useState(false);
   const [startPos, setStartPos] = useState({ x: 0, y: 0 });
 
-  // PHÓNG TO VÒNG TRÒN CẮT ẢNH: Đặt kích thước vùng chứa ảnh là 300px (to rõ)
   const CONTAINER_SIZE = 300;
 
   const onPointerDown = (e) => {
@@ -303,19 +302,19 @@ const SimpleCropper = ({ imageSrc, onSave, onCancel }) => {
 
   const applyCrop = () => {
     const canvas = document.createElement("canvas");
-    // GIỮ NGUYÊN ĐỘ PHÂN GIẢI CAO: Ảnh sau khi cắt vẫn là HD 500x500 pixel
     canvas.width = 500;
     canvas.height = 500;
     const ctx = canvas.getContext("2d");
     const img = new Image();
     img.src = imageSrc;
     img.onload = () => {
-      ctx.fillStyle = "#fff";
-      ctx.fillRect(0, 0, 500, 500);
+      // Nền trong suốt để tránh viền trắng thừa khi bo tròn
+      ctx.clearRect(0, 0, 500, 500);
 
       const ratio = 500 / CONTAINER_SIZE;
-      const minDim = Math.min(img.width, img.height);
-      const baseScale = CONTAINER_SIZE / minDim;
+      // TÍNH TOÁN THEO CẠNH DÀI NHẤT -> Ảnh luôn nằm trọn trong khung tròn
+      const maxDim = Math.max(img.width, img.height);
+      const baseScale = CONTAINER_SIZE / maxDim;
       const drawScale = baseScale * zoom * ratio;
 
       const w = img.width * drawScale;
@@ -324,21 +323,20 @@ const SimpleCropper = ({ imageSrc, onSave, onCancel }) => {
       const y = 250 - h / 2 + position.y * ratio;
 
       ctx.drawImage(img, x, y, w, h);
-      onSave(canvas.toDataURL("image/jpeg", 0.9));
+      // LƯU ẢNH PNG ĐỂ GIỮ NỀN TRONG SUỐT BÊN NGOÀI VIỀN TRÒN
+      onSave(canvas.toDataURL("image/png"));
     };
   };
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/85 p-4 animate-fade-in backdrop-blur-sm">
-      {/* THU NHỎ BẢNG HỘI THOẠI: Dùng max-w-sm để bảng trắng nhỏ gọn lại như cũ */}
       <div className="bg-white p-6 rounded-[2rem] w-full max-w-sm flex flex-col items-center shadow-2xl">
         <h3 className="font-black text-2xl mb-6 text-[#133c3e] uppercase tracking-wide border-b-2 border-[#e5c07b] pb-2">
           Căn Chỉnh Logo
         </h3>
 
-        {/* VÒNG TRÒN CẮT ẢNH TO: Kích thước 300x300 pixel, chiếm gần hết bảng trắng */}
         <div
-          className="relative w-[300px] h-[300px] overflow-hidden rounded-full border-4 border-[#e5c07b] bg-gray-100 cursor-move shadow-[inset_0_0_20px_rgba(0,0,0,0.2)]"
+          className="relative w-[300px] h-[300px] overflow-hidden rounded-full border-4 border-[#e5c07b] bg-gray-50 cursor-move shadow-[inset_0_0_20px_rgba(0,0,0,0.1)]"
           onMouseDown={onPointerDown}
           onMouseMove={onPointerMove}
           onMouseUp={onPointerUp}
@@ -356,8 +354,9 @@ const SimpleCropper = ({ imageSrc, onSave, onCancel }) => {
               position: "absolute",
               top: "50%",
               left: "50%",
-              minWidth: "100%",
-              minHeight: "100%",
+              // SỬ DỤNG MAX-WIDTH THAY VÌ MIN-WIDTH ĐỂ ẢNH THU GỌN VÀO TRONG
+              maxWidth: "100%",
+              maxHeight: "100%",
               width: "auto",
               height: "auto",
               pointerEvents: "none",
@@ -366,12 +365,12 @@ const SimpleCropper = ({ imageSrc, onSave, onCancel }) => {
           <div className="absolute inset-0 pointer-events-none border-[15px] border-white/20 rounded-full"></div>
         </div>
 
-        {/* Thanh Zoom */}
         <div className="w-full mt-8 flex items-center gap-4 px-2">
           <span className="text-2xl opacity-60">🔍</span>
+          {/* CHO PHÉP ZOOM OUT (THU NHỎ) XUỐNG 0.5 ĐỂ TẠO PADDING */}
           <input
             type="range"
-            min="1"
+            min="0.5"
             max="3"
             step="0.05"
             value={zoom}
@@ -382,7 +381,7 @@ const SimpleCropper = ({ imageSrc, onSave, onCancel }) => {
         </div>
 
         <p className="text-xs text-gray-500 mt-4 mb-8 font-bold uppercase tracking-wider bg-gray-100 px-4 py-2 rounded-full">
-          👆 Dùng 1 ngón tay kéo để di chuyển ảnh
+          👆 Kéo thả để căn chỉnh ảnh
         </p>
 
         <div className="flex gap-4 w-full mt-2">
@@ -1030,7 +1029,7 @@ const AdminDashboard = ({
 
   return (
     <div className="space-y-6">
-      {/* CÔNG CỤ CẮT ẢNH HIỂN THỊ KHI CHỌN FILE (VÒNG TRÒN TO, BẢNG NHỎ) */}
+      {/* CÔNG CỤ CẮT ẢNH HIỂN THỊ KHI CHỌN FILE (BẢO TOÀN CHI TIẾT) */}
       {tempLogo && (
         <SimpleCropper
           imageSrc={tempLogo}
